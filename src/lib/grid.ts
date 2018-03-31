@@ -3,12 +3,13 @@ import { Vector2D } from "./position";
 export class GridItem {
   constructor (
     public position: Vector2D,
+    public size: number,
     public color: string,
   ) { }
 }
 
 export class GridCollection {
-  private grid: GridItem[][];
+  private grid: GridItem[];
 
   constructor (private size: number) {}
 
@@ -21,6 +22,6 @@ export class GridCollection {
     ) {
       console.warn(`Tried to add grid item [${item.position.x, item.position.y}] out of range 0..${this.size}`)
     }
-    this.grid[item.position.y][item.position.x] = item;
+    this.grid.push(item);
   }
 }

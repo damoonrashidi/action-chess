@@ -1,5 +1,5 @@
 import { Component, Element } from '@stencil/core';
-import { GridPosition } from '../../lib/position';
+import { GridItem } from '../../lib/grid';
 
 
 @Component({
@@ -13,11 +13,19 @@ export class AppRoot {
   ctx: CanvasRenderingContext2D;
   WIDTH  = 800;
   HEIGHT = 800;
-  GRID_SIZE = this.WIDTH / 8;
-  gridItems: GridPosition[] = [...Array(8 * 8).keys()].map(i => ({
-    color: i % 2 === 0 ? '#f00' : '#eee',
-    position: {x: i % 8, y: 0},
-  }));
+  SIZE   = this.WIDTH / 8;
+  gridItems: GridItem[] = [];
+
+  constructor () {
+    let count = 0;
+    for (let y = 0; y < 8; y++) {
+      for (let x = 0; x < 8; x++) {
+        this.gridItems.push(
+          new GridItem({x, y}, this.SIZE, (++count + y) % 2 === 0 ? '#223' : '#eee')
+        );
+      }
+    }
+  }
 
   render() {
     return <div class="host">
@@ -33,26 +41,22 @@ export class AppRoot {
   paint () {
     this.ctx.clearRect(0, 0, this.WIDTH, this.HEIGHT);
     this.drawSquares();
-    // window.requestAnimationFrame(this.paint.bind(this));
+    //this.drawPieces();
+    //this.drawCards();
+    //this.drawDeck();
   }
 
   drawSquares () {
     for (let i = 0; i < this.gridItems.length; i++) {
       const gridItem = this.gridItems[i];
       this.ctx.fillStyle = gridItem.color;
-      console.log(gridItem.position.x * this.GRID_SIZE,
-        gridItem.position.y * this.GRID_SIZE,
-        gridItem.position.x * this.GRID_SIZE + this.GRID_SIZE,
-        gridItem.position.y * this.GRID_SIZE + this.GRID_SIZE,
-        gridItem.color
+      console.log(gridItem.position.x, gridItem.position.y, gridItem.color);
+      this.ctx.fillRect(
+        gridItem.position.x * gridItem.size,
+        gridItem.position.y * gridItem.size,
+        gridItem.size,
+        gridItem.size,
       );
-      this.ctx.rect(
-        gridItem.position.x * this.GRID_SIZE,
-        gridItem.position.y * this.GRID_SIZE,
-        gridItem.position.x * this.GRID_SIZE + this.GRID_SIZE,
-        gridItem.position.y * this.GRID_SIZE + this.GRID_SIZE
-      );
-      this.ctx.fill();
     }
   }
 }
