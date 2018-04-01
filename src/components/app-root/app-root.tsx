@@ -1,5 +1,5 @@
 import { Component, Element } from '@stencil/core';
-import { GridItem } from '../../lib/grid';
+import { GridItem } from '../../lib/board';
 
 
 @Component({
@@ -21,7 +21,12 @@ export class AppRoot {
     for (let y = 0; y < 8; y++) {
       for (let x = 0; x < 8; x++) {
         this.gridItems.push(
-          new GridItem({x, y}, this.SIZE, (++count + y) % 2 === 0 ? '#223' : '#eee')
+          new GridItem(
+            {x, y},
+            this.SIZE,
+            (++count + y) % 2 === 0 ? '#223' : '#eee',
+            null
+          )
         );
       }
     }
@@ -41,7 +46,6 @@ export class AppRoot {
   paint () {
     this.ctx.clearRect(0, 0, this.WIDTH, this.HEIGHT);
     this.drawSquares();
-    //this.drawPieces();
     //this.drawCards();
     //this.drawDeck();
   }
@@ -50,7 +54,6 @@ export class AppRoot {
     for (let i = 0; i < this.gridItems.length; i++) {
       const gridItem = this.gridItems[i];
       this.ctx.fillStyle = gridItem.color;
-      console.log(gridItem.position.x, gridItem.position.y, gridItem.color);
       this.ctx.fillRect(
         gridItem.position.x * gridItem.size,
         gridItem.position.y * gridItem.size,
