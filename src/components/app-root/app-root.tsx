@@ -1,5 +1,9 @@
 import { Component, Element } from '@stencil/core';
 import { GridItem } from '../../lib/board';
+import { Pawn } from '../../lib/pieces/pawn';
+
+let player1 = new Player();
+let player2 = new Player();
 
 
 @Component({
@@ -25,7 +29,7 @@ export class AppRoot {
             {x, y},
             this.SIZE,
             (++count + y) % 2 === 0 ? '#223' : '#eee',
-            null
+            x == 0 ? new Pawn({x,y}, player1) : null
           )
         );
       }
@@ -60,6 +64,9 @@ export class AppRoot {
         gridItem.size,
         gridItem.size,
       );
+      if (gridItem.piece !== null) {
+        gridItem.piece.draw(this.ctx, gridItem.position);
+      }
     }
   }
 }

@@ -42,7 +42,4 @@ export class Board {
     }
   }
 
-  kill (position: Vector2D) {
-    this.grid[this.getIndexOfLocation(position)].piece = null;
-  }
 }
