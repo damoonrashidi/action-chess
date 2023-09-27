@@ -1,0 +1,22 @@
+{
+    "name": "Action chess codespace",
+    "extensions": [
+        "cschleiden.vscode-github-actions",
+        "rust-lang.rust-analyzer",
+        "serayuzgur.crates",
+        "vadimcn.vscode-lldb"
+    ],
+    "dockesFile": "Dockerfile",
+    "settings": {
+       "terminal.integratedshell.linux": "/usr/bin/zsh",
+       "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/*.crswap": true
+       }
+    }
+}
