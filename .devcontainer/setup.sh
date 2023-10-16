@@ -6,16 +6,14 @@ apt-get install -y \
   jq \
   sudo \
   zsh \
-  helix \
   build-essential \
   openssl
 
+sudo add-apt-repository ppa:maveonair/helix-editor
+sudo apt update
+sudo apt install helix
+
 curl https://sh.rustup.rs -sSf | sh -s -- -y
-rustup install nightly
-rustup component add rustfmt
-rustup component add rustfmt --toolchain nightly
-rustup component add clippy
-rustup component add clippy --toolchain nightly
 
 cargo install cargo-expand
 cargo install cargo-edit
