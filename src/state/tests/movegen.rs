@@ -3,7 +3,7 @@ mod tests {
     use crate::state::{
         board::Board,
         movegen::MoveGen,
-        piece::{Color::White, Piece},
+        piece::{Color::White, Move, Piece},
         square::*,
     };
 
@@ -35,6 +35,8 @@ mod tests {
 
         moves.iter().for_each(|m| println!("{m}"));
 
-        assert_eq!(moves.len(), 11);
+        let expected_moves: Vec<Move> = [].iter().map(|dest| Move::Piece(A5, *dest)).collect();
+
+        assert!(moves.iter().all(|e| expected_moves.contains(e)));
     }
 }

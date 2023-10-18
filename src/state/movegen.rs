@@ -87,4 +87,29 @@ impl<'board> MoveGen<'board> {
 
         moves
     }
+
+    pub fn get_moves_for_bishop(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
+        let mut moves = vec![];
+
+        [(-1, -1), (-1, 1), (1, 1), (1, -1)]
+            .iter()
+            .for_each(|(y, x)| {
+                let mut coord = Coord(pos.0, pos.1);
+
+                while (0..=7).contains(&(coord.0 + y)) && (0..=7).contains(&(coord.1 + x)) {
+                    coord = Coord(coord.0 + y, coord.1 + x);
+                    if let Some(target) = self.board.get_piece_at(&coord) {
+                        if target.get_color() == piece.get_color() {
+                            break;
+                        } else {
+                            moves.push(Move::Piece(*pos, coord));
+                            break;
+                        }
+                    }
+                    moves.push(Move::Piece(*pos, coord));
+                }
+            });
+
+        moves
+    }
 }
