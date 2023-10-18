@@ -1,5 +1,5 @@
 use super::{
-    coordinate::Coordinate,
+    coordinate::Coord,
     piece::{Color, Move, Piece},
 };
 use core::fmt;
@@ -54,27 +54,12 @@ impl Board {
         }
     }
 
-    pub fn get_piece_at(&self, position: Coordinate) -> &Option<Piece> {
+    pub fn get_piece_at(&self, position: &Coord) -> &Option<Piece> {
         &self.pieces[position.1 as usize][position.0 as usize]
     }
 
-    pub fn set_piece_at(&mut self, piece: Option<Piece>, position: Coordinate) {
+    pub fn set_piece_at(&mut self, piece: Option<Piece>, position: Coord) {
         self.pieces[position.1 as usize][position.0 as usize] = piece
-    }
-
-    pub fn get_legal_moves_for_piece(&self, piece: &Piece, position: &Coordinate) -> Vec<Move> {
-        match piece {
-            Piece::Pawn(_) => self.get_valid_moves_for_pawn(piece, position),
-            Piece::Knight(_) => todo!(),
-            Piece::Bishop(_) => todo!(),
-            Piece::Rook(_) => todo!(),
-            Piece::Queen(_) => todo!(),
-            Piece::King(_) => todo!(),
-        }
-    }
-
-    pub fn get_legal_moves(&self) -> Vec<Move> {
-        vec![]
     }
 
     pub fn process_move(&mut self, m: Move) -> &Self {
@@ -84,7 +69,7 @@ impl Board {
 
         match m {
             Move::Piece(from, to) => {
-                if let Some(piece) = self.get_piece_at(from) {
+                if let Some(piece) = self.get_piece_at(&from) {
                     self.set_piece_at(Some(*piece), to);
                     self.set_piece_at(None, from);
                 }
@@ -118,30 +103,6 @@ impl Board {
         self
     }
 
-    fn get_valid_moves_for_pawn(&self, piece: &Piece, position: &Coordinate) -> Vec<Move> {
-        vec![]
-    }
-
-    fn get_valid_moves_for_knight(&self, piece: &Piece, position: &Coordinate) -> Vec<Move> {
-        vec![]
-    }
-
-    fn get_valid_moves_for_bishop(&self, piece: &Piece, position: &Coordinate) -> Vec<Move> {
-        vec![]
-    }
-
-    fn get_valid_moves_for_rook(&self, piece: &Piece, position: &Coordinate) -> Vec<Move> {
-        vec![]
-    }
-
-    fn get_valid_moves_for_queen(&self, piece: &Piece, position: &Coordinate) -> Vec<Move> {
-        vec![]
-    }
-
-    fn get_valid_moves_for_king(&self, piece: &Piece, position: &Coordinate) -> Vec<Move> {
-        vec![]
-    }
-
     fn is_valid_move(&self, mv: Move) -> bool {
         match mv {
             Move::KingSideCastle(color) => match color {
@@ -157,15 +118,15 @@ impl Board {
         }
     }
 
-    fn _coordinate_for_file_rank(file: char, rank: char) -> Option<Coordinate> {
-        let file_no = file.to_digit(36)? as u8 - 10;
-        let rank_no = rank.to_digit(10)? as u8 - 1;
+    fn _coordinate_for_file_rank(file: char, rank: char) -> Option<Coord> {
+        let file_no = file.to_digit(36)? - 10;
+        let rank_no = rank.to_digit(10)? - 1;
 
         if !(0..7).contains(&file_no) || !(0..7).contains(&rank_no) {
             return None;
         }
 
-        Some(Coordinate(file_no, rank_no))
+        Some(Coord(file_no as i8, rank_no as i8))
     }
 }
 

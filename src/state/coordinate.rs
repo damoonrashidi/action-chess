@@ -1,43 +1,43 @@
 use std::fmt::Display;
 
 #[derive(Clone, Copy, Debug)]
-pub struct Coordinate(pub u8, pub u8);
+pub struct Coord(pub i8, pub i8);
 
-impl Coordinate {
-    pub fn new(file: u8, rank: u8) -> Self {
-        Coordinate(file, rank)
+impl Coord {
+    pub fn new(file: i8, rank: i8) -> Self {
+        Coord(file, rank)
     }
 
-    pub fn down(&self) -> Option<Coordinate> {
+    pub fn down(&self) -> Option<Coord> {
         if self.1 == 0 {
             return None;
         }
-        Some(Coordinate(self.1 - 1, self.0))
+        Some(Coord(self.1 - 1, self.0))
     }
 
-    pub fn up(&self) -> Option<Coordinate> {
+    pub fn up(&self) -> Option<Coord> {
         if self.1 == 7 {
             return None;
         }
-        Some(Coordinate(self.1 + 1, self.0))
+        Some(Coord(self.1 + 1, self.0))
     }
 
-    pub fn left(&self) -> Option<Coordinate> {
+    pub fn left(&self) -> Option<Coord> {
         if self.0 == 0 {
             return None;
         }
-        Some(Coordinate(self.1 - 1, self.0))
+        Some(Coord(self.1 - 1, self.0))
     }
 
-    pub fn right(&self) -> Option<Coordinate> {
+    pub fn right(&self) -> Option<Coord> {
         if self.1 == 7 {
             return None;
         }
-        Some(Coordinate(self.1 + 1, self.0))
+        Some(Coord(self.1 + 1, self.0))
     }
 }
 
-impl Display for Coordinate {
+impl Display for Coord {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let letter = match self.0 {
             0 => "a",
@@ -50,6 +50,6 @@ impl Display for Coordinate {
             7 => "h",
             _ => unreachable!(),
         };
-        write!(f, "{}{}", letter, self.1)
+        write!(f, "{}{}", letter, self.1 + 1)
     }
 }

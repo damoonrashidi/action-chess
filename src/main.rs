@@ -1,11 +1,7 @@
-use action_chess::state::{
-    gamestate::GameState,
-    piece::{Color, Move},
-    square::*,
-};
+use action_chess::state::gamestate::GameState;
 
 fn main() {
-    let mut state: GameState = GameState::new();
+    let state: GameState = GameState::new();
 
     println!("{}", state.board);
 }
