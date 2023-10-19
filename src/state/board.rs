@@ -62,6 +62,29 @@ impl Board {
         self.pieces[position.1 as usize][position.0 as usize] = piece
     }
 
+    pub fn filter_board(&self, piece: Piece) -> Board {
+        let mut pieces = [[None; 8]; 8];
+        for y in 0..8 {
+            for x in 0..8 {
+                pieces[y][x] = match (piece, self.pieces[y][x]) {
+                    (_, None) => None,
+                    (comp, Some(target)) => {
+                        if comp == target {
+                            Some(target)
+                        } else {
+                            None
+                        }
+                    }
+                };
+            }
+        }
+
+        Board {
+            pieces,
+            ..self.clone()
+        }
+    }
+
     pub fn get_pieces_by_color(&self, color: Color) -> Vec<(&Piece, Coord)> {
         self.pieces
             .iter()
@@ -132,17 +155,6 @@ impl Board {
             Move::Piece(_src, _dest) => true,
             Move::Promotion(_src, _dest, _piece) => true,
         }
-    }
-
-    fn _coordinate_for_file_rank(file: char, rank: char) -> Option<Coord> {
-        let file_no = file.to_digit(36)? - 10;
-        let rank_no = rank.to_digit(10)? - 1;
-
-        if !(0..7).contains(&file_no) || !(0..7).contains(&rank_no) {
-            return None;
-        }
-
-        Some(Coord(file_no as i8, rank_no as i8))
     }
 }
 

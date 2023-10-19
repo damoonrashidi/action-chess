@@ -14,7 +14,25 @@ impl<'board> MoveGen<'board> {
     }
 
     pub fn get_possible_moves(&self) -> Vec<Move> {
-        vec![]
+        let mut moves = vec![];
+
+        for y in 0..8 {
+            for x in 0..8 {
+                if let Some(piece) = self.board.pieces[y][x] {
+                    let coord = Coord(y as i8, x as i8);
+                    match piece {
+                        Piece::Pawn(_) => moves.extend(&self.for_pawn(&piece, &coord)),
+                        Piece::Knight(_) => moves.extend(&self.for_knight(&piece, &coord)),
+                        Piece::Bishop(_) => moves.extend(&self.for_bishop(&piece, &coord)),
+                        Piece::Rook(_) => moves.extend(&self.for_rook(&piece, &coord)),
+                        Piece::Queen(_) => todo!(),
+                        Piece::King(_) => todo!(),
+                    }
+                }
+            }
+        }
+
+        moves
     }
 
     pub fn for_pawn(&self, piece: &Piece, _position: &Coord) -> Vec<Move> {
@@ -71,7 +89,7 @@ impl<'board> MoveGen<'board> {
             .for_each(|(y, x)| {
                 let mut coord = Coord(pos.0, pos.1);
 
-                while (0..=7).contains(&(coord.0 + y)) && (0..=7).contains(&(coord.1 + x)) {
+                while (0..8).contains(&(coord.0 + y)) && (0..8).contains(&(coord.1 + x)) {
                     coord = Coord(coord.0 + y, coord.1 + x);
                     if let Some(target) = self.board.get_piece_at(&coord) {
                         if target.get_color() == piece.get_color() {
@@ -96,7 +114,7 @@ impl<'board> MoveGen<'board> {
             .for_each(|(y, x)| {
                 let mut coord = Coord(pos.0, pos.1);
 
-                while (0..=7).contains(&(coord.0 + y)) && (0..=7).contains(&(coord.1 + x)) {
+                while (0..8).contains(&(coord.0 + y)) && (0..8).contains(&(coord.1 + x)) {
                     coord = Coord(coord.0 + y, coord.1 + x);
                     if let Some(target) = self.board.get_piece_at(&coord) {
                         if target.get_color() == piece.get_color() {
@@ -123,7 +141,7 @@ impl<'board> MoveGen<'board> {
     pub fn for_king(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
         (-1..1)
             .flat_map(|i| (-1..1).map(move |j| (i, j)))
-            .filter(|(y, x)| (y, x) != (&0, &0) && !(0..=7).contains(y) && !(0..=7).contains(x))
+            .filter(|(y, x)| (y, x) != (&0, &0) && !(0..8).contains(y) && !(0..8).contains(x))
             .filter(|(y, x)| {
                 if let Some(target) = self.board.get_piece_at(&Coord(*y, *x)) {
                     return target.get_color() != piece.get_color();
