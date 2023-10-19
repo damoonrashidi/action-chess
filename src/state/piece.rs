@@ -1,7 +1,7 @@
 use crate::state::coordinate::Coord;
 use std::fmt::Display;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Piece {
     Pawn(Color),
     Knight(Color),

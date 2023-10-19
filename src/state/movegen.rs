@@ -17,7 +17,7 @@ impl<'board> MoveGen<'board> {
         vec![]
     }
 
-    pub fn get_moves_for_pawn(&self, piece: &Piece, _position: &Coord) -> Vec<Move> {
+    pub fn for_pawn(&self, piece: &Piece, _position: &Coord) -> Vec<Move> {
         let _color = piece.get_color();
 
         // first check if piece can move two steps
@@ -29,7 +29,7 @@ impl<'board> MoveGen<'board> {
         vec![]
     }
 
-    pub fn get_moves_for_knight(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
+    pub fn for_knight(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
         let color = piece.get_color();
 
         let rank = pos.1 as i8;
@@ -63,7 +63,7 @@ impl<'board> MoveGen<'board> {
         .collect()
     }
 
-    pub fn get_moves_for_rook(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
+    pub fn for_rook(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
         let mut moves = vec![];
 
         [(-1, 0), (0, 1), (1, 0), (0, -1)]
@@ -88,7 +88,7 @@ impl<'board> MoveGen<'board> {
         moves
     }
 
-    pub fn get_moves_for_bishop(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
+    pub fn for_bishop(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
         let mut moves = vec![];
 
         [(-1, -1), (-1, 1), (1, 1), (1, -1)]
