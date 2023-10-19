@@ -1,3 +1,5 @@
+use crate::state::piece::Color;
+
 use super::{
     board::Board,
     coordinate::Coord,
@@ -25,8 +27,8 @@ impl<'board> MoveGen<'board> {
                         Piece::Knight(_) => moves.extend(&self.for_knight(&piece, &coord)),
                         Piece::Bishop(_) => moves.extend(&self.for_bishop(&piece, &coord)),
                         Piece::Rook(_) => moves.extend(&self.for_rook(&piece, &coord)),
-                        Piece::Queen(_) => todo!(),
-                        Piece::King(_) => todo!(),
+                        Piece::Queen(_) => moves.extend(&self.for_queen(&piece, &coord)),
+                        Piece::King(_) => moves.extend(&self.for_king(&piece, &coord)),
                     }
                 }
             }
@@ -35,16 +37,54 @@ impl<'board> MoveGen<'board> {
         moves
     }
 
-    pub fn for_pawn(&self, piece: &Piece, _position: &Coord) -> Vec<Move> {
-        let _color = piece.get_color();
+    pub fn for_pawn(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
+        let mut moves = vec![];
+        let mut can_move_one = false;
+        let (dir, start_rank, promotion_rank) = if piece.get_color() == Color::White {
+            (-1, 2, 7)
+        } else {
+            (1, 6, 0)
+        };
 
-        // first check if piece can move two steps
-        // then check if piece can move one step
-        // then check if piece can capture left
-        // then check if piece can capture right
-        // finally check promotions
+        // first check captures
+        let left_capture = Coord(pos.0 - 1, pos.1 + dir);
+        let right_capture = Coord(pos.0 + 1, pos.1 + dir);
+        let forward = Coord(pos.0, pos.1 + dir);
+        let double_forward = Coord(pos.0, pos.1 + dir * 2);
 
-        vec![]
+        if let Some(target) = self.board.get_piece_at(&left_capture) {
+            if target.get_color() != piece.get_color() {
+                moves.push(Move::Piece(*pos, left_capture));
+            }
+        }
+
+        if let Some(target) = self.board.get_piece_at(&right_capture) {
+            if target.get_color() != piece.get_color() {
+                moves.push(Move::Piece(*pos, right_capture));
+            }
+        }
+
+        // second check forward movement
+        if self.board.get_piece_at(&forward).is_none() {
+            can_move_one = true;
+            if forward.1 == promotion_rank {
+                moves.push(Move::Promotion(
+                    *pos,
+                    forward,
+                    Piece::Queen(piece.get_color()),
+                ));
+            } else {
+                moves.push(Move::Piece(*pos, forward));
+            }
+        }
+
+        // check double move
+        if can_move_one && pos.1 == start_rank && self.board.get_piece_at(&double_forward).is_none()
+        {
+            moves.push(Move::Piece(*pos, double_forward));
+        }
+
+        moves
     }
 
     pub fn for_knight(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
@@ -155,5 +195,17 @@ impl<'board> MoveGen<'board> {
             })
             .map(|(y, x)| Move::Piece(*pos, Coord(y, x)))
             .collect()
+    }
+
+    fn all_promotions_at_pos(from: &Coord, to: &Coord, piece: &Piece) -> Vec<Move> {
+        [
+            Piece::Queen(piece.get_color()),
+            Piece::Rook(piece.get_color()),
+            Piece::Bishop(piece.get_color()),
+            Piece::Knight(piece.get_color()),
+        ]
+        .into_iter()
+        .map(|p| Move::Promotion(*from, *to, p))
+        .collect()
     }
 }

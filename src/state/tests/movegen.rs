@@ -87,4 +87,17 @@ mod tests {
 
         assert!(moves.iter().all(|e| expected_moves.contains(e)));
     }
+
+    #[test]
+    pub fn white_pawn_at_start() {
+        let board = Board::new();
+        let movegen = MoveGen::new(&board);
+        let moves = movegen.for_pawn(&Piece::Pawn(White), &A5);
+        let expected_moves: Vec<Move> = [A3, A4]
+            .into_iter()
+            .map(|dest| Move::Piece(A2, dest))
+            .collect();
+
+        assert_eq!(moves, expected_moves);
+    }
 }
