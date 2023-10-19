@@ -112,4 +112,30 @@ impl<'board> MoveGen<'board> {
 
         moves
     }
+
+    pub fn for_queen(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
+        [self.for_bishop(piece, pos), self.for_rook(piece, pos)]
+            .into_iter()
+            .flatten()
+            .collect()
+    }
+
+    pub fn for_king(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
+        (-1..1)
+            .flat_map(|i| (-1..1).map(move |j| (i, j)))
+            .filter(|(y, x)| (y, x) != (&0, &0) && !(0..=7).contains(y) && !(0..=7).contains(x))
+            .filter(|(y, x)| {
+                if let Some(target) = self.board.get_piece_at(&Coord(*y, *x)) {
+                    return target.get_color() != piece.get_color();
+                }
+                true
+            })
+            .filter(|(y, x)| {
+                let _target_square = Coord(*y, *x);
+                let _all_enemy_pieces = self.board.get_pieces_by_color(piece.opposing_color());
+                false
+            })
+            .map(|(y, x)| Move::Piece(*pos, Coord(y, x)))
+            .collect()
+    }
 }

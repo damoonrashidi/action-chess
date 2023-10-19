@@ -62,6 +62,22 @@ impl Board {
         self.pieces[position.1 as usize][position.0 as usize] = piece
     }
 
+    pub fn get_pieces_by_color(&self, color: Color) -> Vec<(&Piece, Coord)> {
+        self.pieces
+            .iter()
+            .flatten()
+            .enumerate()
+            .filter_map(|(i, piece)| {
+                if let Some(piece) = piece {
+                    if (piece.get_color() == color) {
+                        return Some((piece, Coord((i % 8) as i8, (i / 8) as i8)));
+                    }
+                }
+                None
+            })
+            .collect()
+    }
+
     pub fn process_move(&mut self, m: Move) -> &Self {
         if !self.is_valid_move(m) {
             return self;
