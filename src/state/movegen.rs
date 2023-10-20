@@ -21,7 +21,7 @@ impl<'board> MoveGen<'board> {
         for y in 0..8 {
             for x in 0..8 {
                 if let Some(piece) = self.board.pieces[y][x] {
-                    let coord = Coord(y as i8, x as i8);
+                    let coord = Coord(x as i8, y as i8);
                     match piece {
                         Piece::Pawn(_) => moves.extend(&self.for_pawn(&piece, &coord)),
                         Piece::Knight(_) => moves.extend(&self.for_knight(&piece, &coord)),
@@ -52,9 +52,9 @@ impl<'board> MoveGen<'board> {
         let forward = Coord(pos.0, pos.1 + dir);
         let double_forward = Coord(pos.0, pos.1 + dir * 2);
 
-        if let (true, Some(target)) = (
-            left_capture.is_valid(),
+        if let (Some(target), true) = (
             self.board.get_piece_at(&left_capture),
+            left_capture.is_valid(),
         ) {
             if target.get_color() != piece.get_color() {
                 if left_capture.1 == promotion_rank {
@@ -115,7 +115,7 @@ impl<'board> MoveGen<'board> {
         ]
         .into_iter()
         .filter(|(f, r)| {
-            let coord_is_valid = (0..7).contains(f) && (0..7).contains(r);
+            let coord_is_valid = (0..8).contains(f) && (0..8).contains(r);
             if !coord_is_valid {
                 return false;
             }

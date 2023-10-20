@@ -2,6 +2,7 @@
 mod tests {
     use crate::state::{
         board::Board,
+        coordinate::Coord,
         movegen::MoveGen,
         piece::{
             Color::{Black, White},
@@ -11,6 +12,14 @@ mod tests {
     };
 
     #[test]
+    fn all_possible_moves() {
+        let board = Board::new();
+        let movegen = MoveGen::new(&board);
+        let moves = movegen.get_possible_moves();
+        assert_eq!(moves.len(), 40);
+    }
+
+    #[test]
     fn knight_on_standard_board() {
         let board = Board::new();
         let movegen = MoveGen::new(&board);
@@ -18,6 +27,22 @@ mod tests {
         let e4 = movegen.for_knight(&Piece::Knight(White), &E4);
 
         assert_eq!(e4.len(), 6);
+    }
+    #[test]
+    fn knight_in_starting_position() {
+        let board = Board::new();
+        let gen = MoveGen::new(&board);
+        let moves = gen.for_knight(&Piece::Knight(White), &G1);
+        let coords: Vec<(&Coord, &Coord)> = moves
+            .iter()
+            .map(|m| match m {
+                Move::Piece(from, to) => (from, to),
+                _ => unreachable!(),
+            })
+            .collect();
+        let expected_moves = vec![(&G1, &F3), (&G1, &H3)];
+
+        assert_eq!(coords, expected_moves);
     }
 
     #[test]
