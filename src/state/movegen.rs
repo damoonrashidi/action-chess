@@ -41,9 +41,9 @@ impl<'board> MoveGen<'board> {
         let mut moves = vec![];
         let mut can_move_one = false;
         let (dir, start_rank, promotion_rank) = if piece.get_color() == Color::White {
-            (-1, 2, 7)
+            (1, 1, 7)
         } else {
-            (1, 6, 0)
+            (-1, 6, 0)
         };
 
         // first check captures
@@ -52,27 +52,37 @@ impl<'board> MoveGen<'board> {
         let forward = Coord(pos.0, pos.1 + dir);
         let double_forward = Coord(pos.0, pos.1 + dir * 2);
 
-        if let Some(target) = self.board.get_piece_at(&left_capture) {
+        if let (true, Some(target)) = (
+            left_capture.is_valid(),
+            self.board.get_piece_at(&left_capture),
+        ) {
             if target.get_color() != piece.get_color() {
-                moves.push(Move::Piece(*pos, left_capture));
+                if left_capture.1 == promotion_rank {
+                    moves.extend(MoveGen::all_promotions_at_pos(pos, &left_capture, &piece));
+                } else {
+                    moves.push(Move::Piece(*pos, left_capture));
+                }
             }
         }
 
-        if let Some(target) = self.board.get_piece_at(&right_capture) {
+        if let (true, Some(target)) = (
+            right_capture.is_valid(),
+            self.board.get_piece_at(&right_capture),
+        ) {
             if target.get_color() != piece.get_color() {
-                moves.push(Move::Piece(*pos, right_capture));
+                if right_capture.1 == promotion_rank {
+                    moves.extend(MoveGen::all_promotions_at_pos(pos, &right_capture, &piece));
+                } else {
+                    moves.push(Move::Piece(*pos, right_capture));
+                }
             }
         }
 
-        // second check forward movement
-        if self.board.get_piece_at(&forward).is_none() {
+        // check forward movement
+        if forward.is_valid() && self.board.get_piece_at(&forward).is_none() {
             can_move_one = true;
             if forward.1 == promotion_rank {
-                moves.push(Move::Promotion(
-                    *pos,
-                    forward,
-                    Piece::Queen(piece.get_color()),
-                ));
+                moves.extend(MoveGen::all_promotions_at_pos(pos, &forward, &piece));
             } else {
                 moves.push(Move::Piece(*pos, forward));
             }

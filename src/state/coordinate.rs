@@ -35,6 +35,10 @@ impl Coord {
         }
         Some(Coord(self.1 + 1, self.0))
     }
+
+    pub fn is_valid(&self) -> bool {
+        (0..8).contains(&self.0) && (0..8).contains(&self.1)
+    }
 }
 
 impl Display for Coord {
@@ -48,7 +52,7 @@ impl Display for Coord {
             5 => "f",
             6 => "g",
             7 => "h",
-            _ => unreachable!(),
+            _ => panic!("tried to get file for {}", self.0),
         };
         write!(f, "{}{}", letter, self.1 + 1)
     }

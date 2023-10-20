@@ -55,6 +55,9 @@ impl Board {
     }
 
     pub fn get_piece_at(&self, position: &Coord) -> &Option<Piece> {
+        if !position.is_valid() {
+            return &None;
+        }
         &self.pieces[position.1 as usize][position.0 as usize]
     }
 
