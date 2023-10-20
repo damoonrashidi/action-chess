@@ -20,6 +20,49 @@ mod tests {
     }
 
     #[test]
+    fn king_on_empty_board() {
+        let board = Board::default();
+        let gen = MoveGen::new(&board);
+        let moves = gen.for_king(&Piece::King(White), &A1);
+
+        let expected_moves: Vec<Move> = [A2, B1, B2]
+            .iter()
+            .map(|dest| Move::Piece(A1, *dest))
+            .collect();
+
+        assert!(moves.iter().all(|e| expected_moves.contains(e)));
+    }
+
+    #[test]
+    fn king_cant_move_into_check() {
+        let mut board = Board::default();
+        board.set_piece_at(Some(Piece::Rook(Black)), A1);
+        let gen = MoveGen::new(&board);
+        let moves = gen.for_king(&Piece::King(White), &B2);
+
+        let expected_moves: Vec<Move> = [B3, C2, C3]
+            .iter()
+            .map(|dest| Move::Piece(B2, *dest))
+            .collect();
+
+        assert!(moves.iter().all(|e| expected_moves.contains(e)));
+    }
+
+    #[test]
+    fn king_cant_move_into_pawn_check() {
+        let board = Board::new();
+        let gen = MoveGen::new(&board);
+        let moves = gen.for_king(&Piece::King(White), &E6);
+
+        let expected_moves: Vec<Move> = [E5, D5, F5, D6, F6]
+            .iter()
+            .map(|dest| Move::Piece(B2, *dest))
+            .collect();
+
+        assert!(moves.iter().all(|e| expected_moves.contains(e)));
+    }
+
+    #[test]
     fn knight_on_standard_board() {
         let board = Board::new();
         let movegen = MoveGen::new(&board);

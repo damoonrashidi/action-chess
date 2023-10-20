@@ -65,7 +65,19 @@ impl Board {
         self.pieces[position.1 as usize][position.0 as usize] = piece
     }
 
-    pub fn filter_board(&self, piece: Piece) -> Board {
+    pub fn remove_by_piece(&mut self, piece: &Piece) {
+        for y in 0..8 {
+            for x in 0..8 {
+                if let Some(target) = self.pieces[y][x] {
+                    if std::mem::discriminant(&target) == std::mem::discriminant(piece) {
+                        self.pieces[y][x] = None;
+                    }
+                }
+            }
+        }
+    }
+
+    pub fn filter_by_piece(&self, piece: Piece) -> Board {
         let mut pieces = [[None; 8]; 8];
         for y in 0..8 {
             for x in 0..8 {
@@ -88,20 +100,28 @@ impl Board {
         }
     }
 
-    pub fn get_pieces_by_color(&self, color: Color) -> Vec<(&Piece, Coord)> {
-        self.pieces
-            .iter()
-            .flatten()
-            .enumerate()
-            .filter_map(|(i, piece)| {
-                if let Some(piece) = piece {
-                    if (piece.get_color() == color) {
-                        return Some((piece, Coord((i % 8) as i8, (i / 8) as i8)));
+    pub fn filter_by_color(&self, color: Color) -> Board {
+        let mut pieces = [[None; 8]; 8];
+
+        for y in 0..8 {
+            for x in 0..8 {
+                pieces[y][x] = match (color, self.pieces[y][x]) {
+                    (_, None) => None,
+                    (comp, Some(target)) => {
+                        if comp == target.get_color() {
+                            Some(target)
+                        } else {
+                            None
+                        }
                     }
-                }
-                None
-            })
-            .collect()
+                };
+            }
+        }
+
+        Board {
+            pieces,
+            ..self.clone()
+        }
     }
 
     pub fn process_move(&mut self, m: Move) -> &Self {

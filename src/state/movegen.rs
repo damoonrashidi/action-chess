@@ -1,10 +1,9 @@
-use crate::state::piece::Color;
-
 use super::{
     board::Board,
     coordinate::Coord,
     piece::{Move, Piece},
 };
+use crate::state::piece::Color;
 
 pub struct MoveGen<'board> {
     board: &'board Board,
@@ -190,20 +189,20 @@ impl<'board> MoveGen<'board> {
 
     pub fn for_king(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
         (-1..1)
-            .flat_map(|i| (-1..1).map(move |j| (i, j)))
-            .filter(|(y, x)| (y, x) != (&0, &0) && !(0..8).contains(y) && !(0..8).contains(x))
-            .filter(|(y, x)| {
-                if let Some(target) = self.board.get_piece_at(&Coord(*y, *x)) {
-                    return target.get_color() != piece.get_color();
-                }
-                true
+            .flat_map(|i| (-1..1).map(move |j| Coord(i, j)))
+            .filter(|coord| coord.is_valid())
+            .filter(|coord| {
+                let mut enemy_board = self.board.filter_by_color(piece.opposing_color());
+                enemy_board.set_piece_at(Some(*piece), *coord);
+                enemy_board.remove_by_piece(&Piece::King(piece.opposing_color()));
+                let movegen = MoveGen::new(&enemy_board);
+                let moves = movegen.get_possible_moves();
+                moves.iter().any(|m| match m {
+                    Move::Piece(_, target) => target == coord,
+                    _ => false,
+                })
             })
-            .filter(|(y, x)| {
-                let _target_square = Coord(*y, *x);
-                let _all_enemy_pieces = self.board.get_pieces_by_color(piece.opposing_color());
-                false
-            })
-            .map(|(y, x)| Move::Piece(*pos, Coord(y, x)))
+            .map(|target| Move::Piece(*pos, target))
             .collect()
     }
 
