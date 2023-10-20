@@ -128,4 +128,18 @@ mod tests {
             .collect();
         assert_eq!(moves, expected_moves);
     }
+
+    #[test]
+    fn promote_white_pawn() {
+        let mut board = Board::default();
+
+        board.set_piece_at(Some(Piece::Bishop(White)), A6);
+        let movegen = MoveGen::new(&board);
+        let moves = movegen.for_pawn(&Piece::Pawn(Black), &B7);
+        let expected_moves: Vec<Move> = [A6, B6, B5]
+            .into_iter()
+            .map(|dest| Move::Piece(B7, dest))
+            .collect();
+        assert_eq!(moves, expected_moves);
+    }
 }
