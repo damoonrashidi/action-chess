@@ -7,10 +7,10 @@ Action chess is the same chess you know and love, with castling, en passant, pro
 - [x] Render a board
 - [x] Move pieces about
 - [x] render board in terminal
+- [x] Find a list of legal moves
 
 ## What isn't yet implemented but being worked on
 
-- [ ] Find a list of legal moves
 - [ ] Networking
 - [ ] Render to some ui
 
