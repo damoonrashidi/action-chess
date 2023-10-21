@@ -64,9 +64,9 @@ impl<'board> MoveGen<'board> {
             }
         }
 
-        if let (true, Some(target)) = (
-            right_capture.is_valid(),
+        if let (Some(target), true) = (
             self.board.get_piece_at(&right_capture),
+            right_capture.is_valid(),
         ) {
             if target.get_color() != piece.get_color() {
                 if right_capture.1 == promotion_rank {
@@ -143,12 +143,10 @@ impl<'board> MoveGen<'board> {
                         continue;
                     }
                     if let Some(target) = self.board.get_piece_at(&coord) {
-                        if target.get_color() == piece.get_color() {
-                            break;
-                        } else {
+                        if target.get_color() != piece.get_color() {
                             moves.push(Move::Piece(*pos, coord));
-                            break;
                         }
+                        break;
                     }
                     moves.push(Move::Piece(*pos, coord));
                 }
@@ -171,12 +169,10 @@ impl<'board> MoveGen<'board> {
                         continue;
                     }
                     if let Some(target) = self.board.get_piece_at(&coord) {
-                        if target.get_color() == piece.get_color() {
-                            break;
-                        } else {
+                        if target.get_color() != piece.get_color() {
                             moves.push(Move::Piece(*pos, coord));
-                            break;
                         }
+                        break;
                     }
                     moves.push(Move::Piece(*pos, coord));
                 }
@@ -208,7 +204,7 @@ impl<'board> MoveGen<'board> {
                 enemy_board.remove_by_piece(&Piece::King(piece.opposing_color()));
                 let movegen = MoveGen::new(&enemy_board);
                 let enemy_moves = movegen.get_possible_moves();
-                let enemy_can_capture = enemy_moves
+                let enemy_can_capture_at_coord = enemy_moves
                     .iter()
                     .filter(|m| matches!(m, Move::Piece(_, _)))
                     .map(|m| match m {
@@ -217,7 +213,7 @@ impl<'board> MoveGen<'board> {
                     })
                     .collect::<Vec<&Coord>>()
                     .contains(&coord);
-                !enemy_can_capture
+                !enemy_can_capture_at_coord
             })
             .map(|target| Move::Piece(*pos, target))
             .collect();
