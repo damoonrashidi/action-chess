@@ -113,19 +113,18 @@ impl<'board> MoveGen<'board> {
             (file + 1, rank + 2),
         ]
         .into_iter()
-        .filter(|(f, r)| {
-            let coord_is_valid = (0..8).contains(f) && (0..8).contains(r);
-            if !coord_is_valid {
+        .map(|(f, r)| Coord(f, r))
+        .filter(|coord| {
+            if !coord.is_valid() {
                 return false;
             }
 
-            if let Some(piece) = self.board.get_piece_at(&Coord(*f, *r)) {
+            if let Some(piece) = self.board.get_piece_at(&coord) {
                 return piece.get_color() != color;
             }
 
             true
         })
-        .map(|(f, r)| Coord(f, r))
         .map(|coord| Move::Piece(*pos, coord))
         .collect()
     }
@@ -140,6 +139,9 @@ impl<'board> MoveGen<'board> {
 
                 while (0..8).contains(&(coord.0 + y)) && (0..8).contains(&(coord.1 + x)) {
                     coord = Coord(coord.0 + y, coord.1 + x);
+                    if coord == *pos {
+                        continue;
+                    }
                     if let Some(target) = self.board.get_piece_at(&coord) {
                         if target.get_color() == piece.get_color() {
                             break;
@@ -165,6 +167,9 @@ impl<'board> MoveGen<'board> {
 
                 while (0..8).contains(&(coord.0 + y)) && (0..8).contains(&(coord.1 + x)) {
                     coord = Coord(coord.0 + y, coord.1 + x);
+                    if coord == *pos {
+                        continue;
+                    }
                     if let Some(target) = self.board.get_piece_at(&coord) {
                         if target.get_color() == piece.get_color() {
                             break;
@@ -188,22 +193,70 @@ impl<'board> MoveGen<'board> {
     }
 
     pub fn for_king(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
-        (-1..1)
-            .flat_map(|i| (-1..1).map(move |j| Coord(i, j)))
-            .filter(|coord| coord.is_valid())
+        let mut natural_moves: Vec<Move> = (-1..=1)
+            .flat_map(|i| (-1..=1).map(move |j| Coord(pos.0 + i, pos.1 + j)))
+            .filter(|coord| coord.is_valid() && coord != pos)
+            .filter(|coord| {
+                if let Some(target) = self.board.get_piece_at(coord) {
+                    return target.get_color() != piece.get_color();
+                }
+                true
+            })
             .filter(|coord| {
                 let mut enemy_board = self.board.filter_by_color(piece.opposing_color());
                 enemy_board.set_piece_at(Some(*piece), *coord);
                 enemy_board.remove_by_piece(&Piece::King(piece.opposing_color()));
                 let movegen = MoveGen::new(&enemy_board);
-                let moves = movegen.get_possible_moves();
-                moves.iter().any(|m| match m {
-                    Move::Piece(_, target) => target == coord,
-                    _ => false,
-                })
+                let enemy_moves = movegen.get_possible_moves();
+                let enemy_can_capture = enemy_moves
+                    .iter()
+                    .filter(|m| matches!(m, Move::Piece(_, _)))
+                    .map(|m| match m {
+                        Move::Piece(_, target) => target,
+                        _ => unreachable!(),
+                    })
+                    .collect::<Vec<&Coord>>()
+                    .contains(&coord);
+                !enemy_can_capture
             })
             .map(|target| Move::Piece(*pos, target))
-            .collect()
+            .collect();
+
+        let (can_castle_king_side, can_castle_queen_side, castle_rank) =
+            if piece.get_color() == Color::White {
+                (
+                    self.board.white_can_castle_kingside,
+                    self.board.white_can_castle_queenside,
+                    0,
+                )
+            } else {
+                (
+                    self.board.black_can_castle_kingside,
+                    self.board.black_can_castle_queenside,
+                    7,
+                )
+            };
+
+        let squares_to_check = if can_castle_king_side {
+            vec![1, 2]
+        } else {
+            vec![-1, -2, -3]
+        };
+
+        let can_castle = squares_to_check
+            .iter()
+            .map(|file_diff| Coord(4 + file_diff, castle_rank))
+            .all(|coord| self.board.get_piece_at(&coord).is_none());
+
+        if can_castle && can_castle_king_side {
+            natural_moves.push(Move::KingSideCastle(piece.get_color()));
+        }
+
+        if can_castle && can_castle_queen_side {
+            natural_moves.push(Move::QueenSideCastle(piece.get_color()));
+        }
+
+        natural_moves
     }
 
     fn all_promotions_at_pos(from: &Coord, to: &Coord, piece: &Piece) -> Vec<Move> {

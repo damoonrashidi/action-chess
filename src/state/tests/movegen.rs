@@ -25,12 +25,7 @@ mod tests {
         let gen = MoveGen::new(&board);
         let moves = gen.for_king(&Piece::King(White), &A1);
 
-        let expected_moves: Vec<Move> = [A2, B1, B2]
-            .iter()
-            .map(|dest| Move::Piece(A1, *dest))
-            .collect();
-
-        assert!(moves.iter().all(|e| expected_moves.contains(e)));
+        assert!(move_lists_has_all_targets(A1, &vec![A2, B1, B2], &moves));
     }
 
     #[test]
@@ -40,26 +35,39 @@ mod tests {
         let gen = MoveGen::new(&board);
         let moves = gen.for_king(&Piece::King(White), &B2);
 
-        let expected_moves: Vec<Move> = [B3, C2, C3]
-            .iter()
-            .map(|dest| Move::Piece(B2, *dest))
-            .collect();
-
-        assert!(moves.iter().all(|e| expected_moves.contains(e)));
+        assert!(move_lists_has_all_targets(
+            B2,
+            &vec![A1, B3, C2, C3],
+            &moves
+        ));
+        assert_eq!(moves.len(), 4);
     }
 
     #[test]
     fn king_cant_move_into_pawn_check() {
         let board = Board::new();
         let gen = MoveGen::new(&board);
-        let moves = gen.for_king(&Piece::King(White), &E6);
+        let moves = gen.for_king(&Piece::King(White), &E5);
+        let expected_moves = [D5, F5, D4, E4, F4];
+        println!("moves");
+        moves.iter().for_each(|m| println!("{m}"));
 
-        let expected_moves: Vec<Move> = [E5, D5, F5, D6, F6]
-            .iter()
-            .map(|dest| Move::Piece(B2, *dest))
-            .collect();
+        assert!(move_lists_has_all_targets(
+            E5,
+            &expected_moves.into(),
+            &moves
+        ));
+        assert_eq!(expected_moves.len(), moves.len());
+    }
 
-        assert!(moves.iter().all(|e| expected_moves.contains(e)));
+    #[test]
+    fn king_castle_kingside() {
+        let mut board = Board::default();
+        board.set_piece_at(Some(Piece::Rook(White)), H1);
+        board.white_can_castle_kingside = true;
+        let gen = MoveGen::new(&board);
+        let moves = gen.for_king(&Piece::King(White), &E1);
+        assert!(moves.contains(&Move::KingSideCastle(White)));
     }
 
     #[test]
@@ -209,5 +217,16 @@ mod tests {
             .map(|dest| Move::Piece(B7, dest))
             .collect();
         assert_eq!(moves, expected_moves);
+    }
+
+    fn move_lists_has_all_targets(
+        start_pos: Coord,
+        expected_targets: &Vec<Coord>,
+        moves: &Vec<Move>,
+    ) -> bool {
+        expected_targets
+            .iter()
+            .map(|target| Move::Piece(start_pos, *target))
+            .all(|m| moves.contains(&m))
     }
 }

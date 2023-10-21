@@ -9,10 +9,10 @@ use core::fmt;
 pub struct Board {
     pub pieces: [[Option<Piece>; 8]; 8],
 
-    white_can_castle_kingside: bool,
-    white_can_castle_queenside: bool,
-    black_can_castle_kingside: bool,
-    black_can_castle_queenside: bool,
+    pub white_can_castle_kingside: bool,
+    pub white_can_castle_queenside: bool,
+    pub black_can_castle_kingside: bool,
+    pub black_can_castle_queenside: bool,
 }
 
 #[allow(unused)]
