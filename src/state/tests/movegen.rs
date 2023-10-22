@@ -72,6 +72,26 @@ mod tests {
     }
 
     #[test]
+    fn moved_king_castle_kingside() {
+        let mut board = Board::default();
+        board.set_piece_at(Some(Piece::Rook(White)), H1);
+        board.white_can_castle_kingside = true;
+        let gen = MoveGen::new(&board);
+        let moves = gen.for_king(&Piece::King(White), &E2);
+        assert!(!moves.contains(&Move::KingSideCastle(White)));
+    }
+
+    #[test]
+    fn king_castle_queenside() {
+        let mut board = Board::default();
+        board.set_piece_at(Some(Piece::Rook(White)), A1);
+        board.white_can_castle_queenside = true;
+        let gen = MoveGen::new(&board);
+        let moves = gen.for_king(&Piece::King(White), &E1);
+        assert!(moves.contains(&Move::QueenSideCastle(White)));
+    }
+
+    #[test]
     fn knight_on_standard_board() {
         let board = Board::new();
         let movegen = MoveGen::new(&board);

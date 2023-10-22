@@ -256,23 +256,38 @@ impl<'board> MoveGen<'board> {
                 )
             };
 
-        let squares_to_check = if can_castle_king_side {
-            vec![1, 2]
-        } else {
-            vec![-1, -2, -3]
-        };
-
-        let can_castle = squares_to_check
-            .iter()
-            .map(|file_diff| Coord(4 + file_diff, castle_rank))
-            .all(|coord| self.board.get_piece_at(&coord).is_none());
-
-        if can_castle && can_castle_king_side {
-            natural_moves.push(Move::KingSideCastle(piece.get_color()));
+        if can_castle_king_side {
+            let king_is_starting_position = pos == &Coord(4, castle_rank);
+            let lane_is_open = [1, 2]
+                .iter()
+                .map(|file_diff| Coord(4 + file_diff, castle_rank))
+                .all(|coord| self.board.get_piece_at(&coord).is_none());
+            if let (Some(target), true, true) = (
+                self.board.get_piece_at(&Coord(7, castle_rank)),
+                lane_is_open,
+                king_is_starting_position,
+            ) {
+                if target == &Piece::Rook(piece.get_color()) {
+                    natural_moves.push(Move::KingSideCastle(piece.get_color()));
+                }
+            }
         }
 
-        if can_castle && can_castle_queen_side {
-            natural_moves.push(Move::QueenSideCastle(piece.get_color()));
+        if can_castle_queen_side {
+            let king_is_starting_position = pos == &Coord(4, castle_rank);
+            let lane_is_open = [-1, -2, -3]
+                .iter()
+                .map(|file_diff| Coord(4 + file_diff, castle_rank))
+                .all(|coord| self.board.get_piece_at(&coord).is_none());
+            if let (Some(target), true, true) = (
+                self.board.get_piece_at(&Coord(0, castle_rank)),
+                lane_is_open,
+                king_is_starting_position,
+            ) {
+                if target == &Piece::Rook(piece.get_color()) {
+                    natural_moves.push(Move::QueenSideCastle(piece.get_color()));
+                }
+            }
         }
 
         natural_moves
