@@ -72,6 +72,21 @@ mod tests {
     }
 
     #[test]
+    fn blocked_queenside_castle() {
+        let mut board = Board::default();
+        board.set_piece_at(Some(Piece::Queen(White)), D1);
+        board.set_piece_at(Some(Piece::Rook(White)), A1);
+        board.set_piece_at(Some(Piece::Rook(White)), H1);
+        board.white_can_castle_kingside = true;
+        board.white_can_castle_queenside = true;
+        let gen = MoveGen::new(&board);
+        let moves = gen.for_king(&Piece::King(White), &E1);
+        MoveGen::render_movelist(&board, &moves);
+        assert!(moves.contains(&Move::KingSideCastle(White)));
+        assert!(!moves.contains(&Move::QueenSideCastle(White)));
+    }
+
+    #[test]
     fn moved_king_castle_kingside() {
         let mut board = Board::default();
         board.set_piece_at(Some(Piece::Rook(White)), H1);
