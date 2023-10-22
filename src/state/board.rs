@@ -69,7 +69,9 @@ impl Board {
         for y in 0..8 {
             for x in 0..8 {
                 if let Some(target) = self.pieces[y][x] {
-                    if std::mem::discriminant(&target) == std::mem::discriminant(piece) {
+                    if std::mem::discriminant(&target) == std::mem::discriminant(piece)
+                        && piece.get_color() == target.get_color()
+                    {
                         self.pieces[y][x] = None;
                     }
                 }

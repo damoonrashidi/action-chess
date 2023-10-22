@@ -36,6 +36,29 @@ impl<'board> MoveGen<'board> {
         moves
     }
 
+    pub fn get_possible_moves_for_color(&self, color: Color) -> Vec<Move> {
+        let mut moves = vec![];
+
+        for y in 0..8 {
+            for x in 0..8 {
+                if let Some(piece) = self.board.pieces[y][x] {
+                    let coord = Coord(x as i8, y as i8);
+                    match (piece, color == piece.get_color()) {
+                        (Piece::Pawn(_), true) => moves.extend(&self.for_pawn(&piece, &coord)),
+                        (Piece::Knight(_), true) => moves.extend(&self.for_knight(&piece, &coord)),
+                        (Piece::Bishop(_), true) => moves.extend(&self.for_bishop(&piece, &coord)),
+                        (Piece::Rook(_), true) => moves.extend(&self.for_rook(&piece, &coord)),
+                        (Piece::Queen(_), true) => moves.extend(&self.for_queen(&piece, &coord)),
+                        (Piece::King(_), true) => moves.extend(&self.for_king(&piece, &coord)),
+                        _ => {}
+                    }
+                }
+            }
+        }
+
+        moves
+    }
+
     pub fn for_pawn(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
         let mut moves = vec![];
         let mut can_move_one = false;
@@ -57,7 +80,7 @@ impl<'board> MoveGen<'board> {
         ) {
             if target.get_color() != piece.get_color() {
                 if left_capture.1 == promotion_rank {
-                    moves.extend(MoveGen::all_promotions_at_pos(pos, &left_capture, piece));
+                    moves.extend(MoveGen::all_promotions_at_pos(pos, &left_capture, &piece));
                 } else {
                     moves.push(Move::Piece(*pos, left_capture));
                 }
@@ -70,7 +93,7 @@ impl<'board> MoveGen<'board> {
         ) {
             if target.get_color() != piece.get_color() {
                 if right_capture.1 == promotion_rank {
-                    moves.extend(MoveGen::all_promotions_at_pos(pos, &right_capture, piece));
+                    moves.extend(MoveGen::all_promotions_at_pos(pos, &right_capture, &piece));
                 } else {
                     moves.push(Move::Piece(*pos, right_capture));
                 }
@@ -81,7 +104,7 @@ impl<'board> MoveGen<'board> {
         if forward.is_valid() && self.board.get_piece_at(&forward).is_none() {
             can_move_one = true;
             if forward.1 == promotion_rank {
-                moves.extend(MoveGen::all_promotions_at_pos(pos, &forward, piece));
+                moves.extend(MoveGen::all_promotions_at_pos(pos, &forward, &piece));
             } else {
                 moves.push(Move::Piece(*pos, forward));
             }
@@ -99,8 +122,8 @@ impl<'board> MoveGen<'board> {
     pub fn for_knight(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
         let color = piece.get_color();
 
-        let rank = pos.1;
-        let file = pos.0;
+        let rank = pos.1 as i8;
+        let file = pos.0 as i8;
 
         [
             (file - 1, rank - 2),
@@ -119,7 +142,7 @@ impl<'board> MoveGen<'board> {
                 return false;
             }
 
-            if let Some(piece) = self.board.get_piece_at(coord) {
+            if let Some(piece) = self.board.get_piece_at(&coord) {
                 return piece.get_color() != color;
             }
 
@@ -203,13 +226,13 @@ impl<'board> MoveGen<'board> {
                 enemy_board.set_piece_at(Some(*piece), *coord);
                 enemy_board.remove_by_piece(&Piece::King(piece.opposing_color()));
                 let movegen = MoveGen::new(&enemy_board);
-                let enemy_moves = movegen.get_possible_moves();
+                let enemy_moves = movegen.get_possible_moves_for_color(piece.opposing_color());
                 let enemy_can_capture_at_coord = enemy_moves
                     .iter()
-                    .filter(|m| matches!(m, Move::Piece(_, _)))
-                    .map(|m| match m {
-                        Move::Piece(_, target) => target,
-                        _ => unreachable!(),
+                    .filter_map(|m| match m {
+                        Move::Piece(_, target) => Some(target),
+                        Move::Promotion(_, target, _) => Some(target),
+                        _ => None,
                     })
                     .collect::<Vec<&Coord>>()
                     .contains(&coord);
@@ -265,5 +288,34 @@ impl<'board> MoveGen<'board> {
         .into_iter()
         .map(|p| Move::Promotion(*from, *to, p))
         .collect()
+    }
+
+    pub fn render_movelist(board: &Board, moves: &[Move]) {
+        let mut render = String::from("  abcdefgh\n");
+        let targets: Vec<Coord> = moves
+            .into_iter()
+            .filter_map(|m| match m {
+                Move::Piece(_, target) => Some(*target),
+                Move::Promotion(_, target, _) => Some(*target),
+                _ => None,
+            })
+            .collect();
+
+        for y in (0..8).rev() {
+            render = format!("\n{render}{} ", y + 1);
+            for x in 0..8 {
+                match (
+                    board.pieces[y][x],
+                    targets.contains(&Coord(x as i8, y as i8)),
+                ) {
+                    (None, true) => render = format!("{render}o"),
+                    (None, false) => render = format!("{render} "),
+                    (Some(_), true) => render = format!("{render}x"),
+                    (Some(p), false) => render = format!("{render}{p}"),
+                }
+            }
+            render = format!("{render} {}\n", y + 1);
+        }
+        println!("{render}\n  abcdefgh")
     }
 }

@@ -51,20 +51,13 @@ mod tests {
 
     #[test]
     fn king_cant_move_into_pawn_check() {
-        let board = Board::new();
+        let mut board = Board::new();
+        board.set_piece_at(Some(Piece::King(White)), E5);
         let gen = MoveGen::new(&board);
         let moves = gen.for_king(&Piece::King(White), &E5);
-        let expected_moves = [D5, F5, D4, E4, F4];
-        println!("moves");
-        for m in &moves {
-            print!("{m} ");
-        }
+        let expected_moves = vec![D5, F5, D4, E4, F4];
 
-        assert!(move_lists_has_all_targets(
-            E5,
-            &expected_moves.into(),
-            &moves
-        ));
+        assert!(move_lists_has_all_targets(E5, &expected_moves, &moves));
         assert_eq!(expected_moves.len(), moves.len());
     }
 
@@ -82,10 +75,9 @@ mod tests {
     fn knight_on_standard_board() {
         let board = Board::new();
         let movegen = MoveGen::new(&board);
+        let moves = movegen.for_knight(&Piece::Knight(White), &E4);
 
-        let e4 = movegen.for_knight(&Piece::Knight(White), &E4);
-
-        assert_eq!(e4.len(), 6);
+        assert_eq!(moves.len(), 6);
     }
     #[test]
     fn knight_in_starting_position() {
@@ -229,8 +221,8 @@ mod tests {
 
     fn move_lists_has_all_targets(
         start_pos: Coord,
-        expected_targets: &Vec<Coord>,
-        moves: &Vec<Move>,
+        expected_targets: &[Coord],
+        moves: &[Move],
     ) -> bool {
         expected_targets
             .iter()
