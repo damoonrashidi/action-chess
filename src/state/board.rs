@@ -55,12 +55,14 @@ impl Board {
         }
     }
 
-    pub fn from_fen(fen: &str) -> Self {
+    pub fn from_fen(fen: &str) -> Option<Self> {
+        let parts = fen.split_whitespace().collect::<Vec<&str>>();
+        let positions = parts.first()?;
         let mut pieces: [[Option<Piece>; 8]; 8] = [[None; 8]; 8];
 
         let mut file = 0;
         let mut rank = 7;
-        for c in fen.chars() {
+        for c in positions.chars() {
             if c == '/' {
                 file = 0;
                 rank -= 1;
@@ -98,13 +100,29 @@ impl Board {
             }
         }
 
-        Board {
-            pieces,
-            white_can_castle_kingside: false,
-            white_can_castle_queenside: false,
-            black_can_castle_kingside: false,
-            black_can_castle_queenside: false,
+        let castle_rights = parts.get(2)?;
+        let mut black_kingside = false;
+        let mut white_kingside = false;
+        let mut black_queenside = false;
+        let mut white_queenside = false;
+
+        for c in castle_rights.chars() {
+            match c {
+                'k' => black_kingside = true,
+                'K' => white_kingside = true,
+                'q' => black_queenside = true,
+                'Q' => white_queenside = true,
+                _ => {}
+            }
         }
+
+        Some(Board {
+            pieces,
+            white_can_castle_kingside: white_kingside,
+            white_can_castle_queenside: white_queenside,
+            black_can_castle_kingside: black_kingside,
+            black_can_castle_queenside: black_queenside,
+        })
     }
 
     pub fn get_piece_at(&self, position: &Coord) -> &Option<Piece> {
