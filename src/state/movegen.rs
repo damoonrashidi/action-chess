@@ -216,6 +216,17 @@ impl<'board> MoveGen<'board> {
             .flat_map(|i| (-1..=1).map(move |j| Coord(pos.0 + i, pos.1 + j)))
             .filter(|coord| coord.is_valid() && coord != pos)
             .filter(|coord| {
+                if let Some(opposing_king_pos) = self
+                    .board
+                    .get_coord_for_piece(&Piece::King(piece.opposing_color()))
+                {
+                    let file_distance = (opposing_king_pos.0 - coord.0).abs();
+                    let rank_distance = (opposing_king_pos.1 - coord.1).abs();
+                    if file_distance <= 1 && rank_distance <= 1 {
+                        return false;
+                    }
+                }
+
                 if let Some(target) = self.board.get_piece_at(coord) {
                     return target.get_color() != piece.get_color();
                 }
@@ -331,6 +342,6 @@ impl<'board> MoveGen<'board> {
             }
             render = format!("{render} {}\n", y + 1);
         }
-        println!("{render}\n  abcdefgh")
+        println!("{render}  abcdefgh")
     }
 }

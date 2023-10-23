@@ -133,19 +133,19 @@ impl Board {
 
         match m {
             Move::Piece(from, to) => {
-                if let Some(piece) = self.get_piece_at(&from) {
-                    self.set_piece_at(Some(*piece), to);
-                    self.set_piece_at(None, from);
-                }
+                let piece = self.get_piece_at(&from);
+                self.set_piece_at(*piece, to);
+                self.set_piece_at(None, from);
             }
             Move::KingSideCastle(color) => {
-                let src_file = if color == Color::White {
+                let src_file = if color == Color::White { 0 } else { 7 };
+                if color == Color::White {
                     self.white_can_castle_kingside = false;
-                    0
+                    self.white_can_castle_queenside = false;
                 } else {
                     self.black_can_castle_kingside = false;
-                    7
-                };
+                    self.black_can_castle_queenside = false;
+                }
                 self.pieces[src_file][4] = None;
                 self.pieces[src_file][7] = None;
                 self.pieces[src_file][6] = Some(Piece::King(color));
@@ -165,6 +165,17 @@ impl Board {
         }
 
         self
+    }
+
+    pub fn get_coord_for_piece(&self, piece: &Piece) -> Option<Coord> {
+        for y in 0..8 {
+            for x in 0..8 {
+                if self.pieces[y][x] == Some(*piece) {
+                    return Some(Coord(x as i8, y as i8));
+                }
+            }
+        }
+        None
     }
 
     fn is_valid_move(&self, mv: Move) -> bool {

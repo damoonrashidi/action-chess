@@ -62,6 +62,17 @@ mod tests {
     }
 
     #[test]
+    fn king_cant_move_into_opposing_king() {
+        let mut board = Board::default();
+        board.set_piece_at(Some(Piece::King(Black)), D5);
+        let gen = MoveGen::new(&board);
+        let moves = gen.for_king(&Piece::King(White), &D3);
+        let expected_moves = vec![C3, E3, C2, D2, E2];
+        assert_eq!(moves.len(), expected_moves.len());
+        assert!(move_lists_has_all_targets(D3, &expected_moves, &moves));
+    }
+
+    #[test]
     fn king_castle_kingside() {
         let mut board = Board::default();
         board.set_piece_at(Some(Piece::Rook(White)), H1);
@@ -81,7 +92,6 @@ mod tests {
         board.white_can_castle_queenside = true;
         let gen = MoveGen::new(&board);
         let moves = gen.for_king(&Piece::King(White), &E1);
-        MoveGen::render_movelist(&board, &moves);
         assert!(moves.contains(&Move::KingSideCastle(White)));
         assert!(!moves.contains(&Move::QueenSideCastle(White)));
     }
