@@ -26,4 +26,15 @@ mod tests {
         let black_pawns = board.filter_by_piece(Piece::Pawn(Black));
         assert_eq!(black_pawns.pieces.len(), 8);
     }
+    #[test]
+    fn standard_fen() {
+        let board = Board::from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+        let standard = Board::new();
+        assert_eq!(board.pieces, standard.pieces);
+    }
+    #[test]
+    fn custom_fen() {
+        let board = Board::from_fen("r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1");
+        print!("{board}");
+    }
 }

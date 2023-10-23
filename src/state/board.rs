@@ -3,6 +3,7 @@ use super::{
     piece::{Color, Move, Piece},
 };
 use core::fmt;
+use std::fmt::Debug;
 
 #[derive(Debug, Clone, Default)]
 #[allow(unused)]
@@ -51,6 +52,58 @@ impl Board {
             white_can_castle_queenside: true,
             black_can_castle_kingside: true,
             black_can_castle_queenside: true,
+        }
+    }
+
+    pub fn from_fen(fen: &str) -> Self {
+        let mut pieces: [[Option<Piece>; 8]; 8] = [[None; 8]; 8];
+
+        let mut file = 0;
+        let mut rank = 7;
+        for c in fen.chars() {
+            if c == '/' {
+                file = 0;
+                rank -= 1;
+            }
+
+            if ('0'..'8').contains(&c) {
+                if let Ok(empties) = c.to_string().parse::<usize>() {
+                    for i in 0..empties {
+                        pieces[rank][file] = None;
+                        file += 1;
+                        continue;
+                    }
+                }
+            }
+            let piece = match c {
+                'p' => Some(Piece::Pawn(Color::Black)),
+                'b' => Some(Piece::Bishop(Color::Black)),
+                'n' => Some(Piece::Knight(Color::Black)),
+                'r' => Some(Piece::Rook(Color::Black)),
+                'q' => Some(Piece::Queen(Color::Black)),
+                'k' => Some(Piece::King(Color::Black)),
+                'P' => Some(Piece::Pawn(Color::White)),
+                'B' => Some(Piece::Bishop(Color::White)),
+                'N' => Some(Piece::Knight(Color::White)),
+                'R' => Some(Piece::Rook(Color::White)),
+                'Q' => Some(Piece::Queen(Color::White)),
+                'K' => Some(Piece::King(Color::White)),
+                _ => None,
+            };
+            if file < 8 {
+                pieces[rank][file] = piece;
+                if piece.is_some() {
+                    file += 1;
+                }
+            }
+        }
+
+        Board {
+            pieces,
+            white_can_castle_kingside: false,
+            white_can_castle_queenside: false,
+            black_can_castle_kingside: false,
+            black_can_castle_queenside: false,
         }
     }
 
