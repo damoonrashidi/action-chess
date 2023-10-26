@@ -117,6 +117,9 @@ impl<'board> MoveGen<'board> {
         }
 
         moves
+            .into_iter()
+            .filter(|m| !self.move_would_result_in_check(m, piece))
+            .collect()
     }
 
     pub fn for_knight(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
@@ -149,6 +152,7 @@ impl<'board> MoveGen<'board> {
             true
         })
         .map(|coord| Move::Piece(*pos, coord))
+        .filter(|m| !self.move_would_result_in_check(m, piece))
         .collect()
     }
 
@@ -176,6 +180,9 @@ impl<'board> MoveGen<'board> {
             });
 
         moves
+            .into_iter()
+            .filter(|m| !self.move_would_result_in_check(m, piece))
+            .collect()
     }
 
     pub fn for_bishop(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
@@ -202,6 +209,9 @@ impl<'board> MoveGen<'board> {
             });
 
         moves
+            .into_iter()
+            .filter(|m| !self.move_would_result_in_check(m, piece))
+            .collect()
     }
 
     pub fn for_queen(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
@@ -302,6 +312,33 @@ impl<'board> MoveGen<'board> {
         }
 
         natural_moves
+    }
+
+    fn move_would_result_in_check(&self, m: &Move, piece: &Piece) -> bool {
+        let mut board = self.board.filter_by_color(piece.opposing_color());
+        let king_pos = self
+            .board
+            .get_coord_for_piece(&Piece::King(piece.get_color()));
+        if king_pos.is_none() {
+            return false;
+        }
+        match m {
+            Move::Piece(_, to) => board.set_piece_at(Some(*piece), *to),
+            Move::Promotion(_, to, _) => board.set_piece_at(Some(*piece), *to),
+            _ => {}
+        }
+        let gen = MoveGen::new(&board);
+        let moves = gen.get_possible_moves();
+
+        moves
+            .into_iter()
+            .filter_map(|m| match m {
+                Move::Piece(_, to) => Some(to),
+                Move::Promotion(_, to, _) => Some(to),
+                _ => None,
+            })
+            .collect::<Vec<Coord>>()
+            .contains(&king_pos.unwrap())
     }
 
     fn all_promotions_at_pos(from: &Coord, to: &Coord, piece: &Piece) -> Vec<Move> {

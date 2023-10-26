@@ -117,6 +117,24 @@ mod tests {
     }
 
     #[test]
+    fn pinned_pawn() {
+        let board = Board::from_fen("8/8/KP5r/8/8/8/8/8 b - - 0 0").unwrap();
+        let gen = MoveGen::new(&board);
+        let moves = gen.for_pawn(&Piece::Pawn(White), &B6);
+        assert_eq!(moves.len(), 0);
+    }
+
+    #[test]
+    fn pinned_rook() {
+        let board = Board::from_fen("8/8/KR5r/8/8/8/8/8 b - - 0 0").unwrap();
+        let gen = MoveGen::new(&board);
+        let moves = gen.for_rook(&Piece::Pawn(White), &B6);
+        println!("{board}");
+        MoveGen::render_movelist(&board, &moves);
+        assert_eq!(moves.len(), 6);
+    }
+
+    #[test]
     fn knight_on_standard_board() {
         let board = Board::new();
         let movegen = MoveGen::new(&board);
@@ -124,12 +142,14 @@ mod tests {
 
         assert_eq!(moves.len(), 6);
     }
+
     #[test]
     fn knight_in_starting_position() {
         let board = Board::new();
         let gen = MoveGen::new(&board);
         let moves = gen.for_knight(&Piece::Knight(White), &G1);
         let expected_moves = vec![H3, F3];
+        MoveGen::render_movelist(&board, &moves);
 
         assert!(move_lists_has_all_targets(G1, &expected_moves, &moves));
     }
@@ -197,7 +217,6 @@ mod tests {
         let board = Board::new().filter_by_color(Black);
         let gen = MoveGen::new(&board);
         let moves = gen.get_possible_moves();
-
         assert_eq!(moves.len(), 20);
     }
 
