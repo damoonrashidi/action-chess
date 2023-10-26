@@ -328,7 +328,7 @@ impl<'board> MoveGen<'board> {
             _ => {}
         }
         let gen = MoveGen::new(&board);
-        let moves = gen.get_possible_moves();
+        let moves = gen.get_possible_moves_for_color(piece.opposing_color());
 
         moves
             .into_iter()
@@ -354,7 +354,8 @@ impl<'board> MoveGen<'board> {
     }
 
     pub fn render_movelist(board: &Board, moves: &[Move]) {
-        let mut render = String::from("  abcdefgh\n");
+        let mut render = String::from("  A | B | C | D | E | F | H \n");
+        render = format!("{render}  |---+---+---+---+---+---+---+---|\n");
         let targets: Vec<Coord> = moves
             .into_iter()
             .filter_map(|m| match m {
@@ -371,14 +372,14 @@ impl<'board> MoveGen<'board> {
                     board.pieces[y][x],
                     targets.contains(&Coord(x as i8, y as i8)),
                 ) {
-                    (None, true) => render = format!("{render}o"),
-                    (None, false) => render = format!("{render} "),
-                    (Some(_), true) => render = format!("{render}x"),
-                    (Some(p), false) => render = format!("{render}{p}"),
+                    (None, true) => render = format!("{render}| o "),
+                    (None, false) => render = format!("{render}|   "),
+                    (Some(_), true) => render = format!("{render}| x "),
+                    (Some(p), false) => render = format!("{render}| {p} "),
                 }
             }
-            render = format!("{render} {}\n", y + 1);
+            render = format!("{render}|\n  |---+---+---+---+---+---+---+---| {}\n", y + 1);
         }
-        println!("{render}  abcdefgh")
+        println!("{render}  A | B | C | D | E | F | H \n")
     }
 }
