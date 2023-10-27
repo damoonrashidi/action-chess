@@ -3,12 +3,13 @@ use super::{
     piece::{Color, Move, Piece},
 };
 use core::fmt;
-use std::fmt::Debug;
+use std::{fmt::Debug, time::Duration};
 
 #[derive(Debug, Clone, Default)]
 #[allow(unused)]
 pub struct Board {
     pub pieces: [[Option<Piece>; 8]; 8],
+    pub cooldowns: Vec<(usize, Duration)>,
 
     pub white_can_castle_kingside: bool,
     pub white_can_castle_queenside: bool,
@@ -17,7 +18,7 @@ pub struct Board {
 }
 
 #[allow(unused)]
-impl Board {
+impl<'piece> Board {
     pub fn new() -> Self {
         let mut pieces: [[Option<Piece>; 8]; 8] = [[None; 8]; 8];
 
@@ -48,6 +49,7 @@ impl Board {
 
         Self {
             pieces,
+            cooldowns: vec![],
             white_can_castle_kingside: true,
             white_can_castle_queenside: true,
             black_can_castle_kingside: true,
@@ -118,6 +120,7 @@ impl Board {
 
         Some(Board {
             pieces,
+            cooldowns: vec![],
             white_can_castle_kingside: white_kingside,
             white_can_castle_queenside: white_queenside,
             black_can_castle_kingside: black_kingside,

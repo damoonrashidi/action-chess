@@ -376,7 +376,7 @@ impl<'board> MoveGen<'board> {
     }
 
     pub fn render_movelist(board: &Board, moves: &[Move]) {
-        let mut render = String::from("  A | B | C | D | E | F | H \n");
+        let mut render = String::from("    A | B | C | D | E | F | G | H \n");
         render = format!("{render}  |---+---+---+---+---+---+---+---|\n");
         let targets: Vec<Coord> = moves
             .into_iter()
@@ -400,8 +400,8 @@ impl<'board> MoveGen<'board> {
                     (Some(p), false) => render = format!("{render}| {p} "),
                 }
             }
-            render = format!("{render}|\n  |---+---+---+---+---+---+---+---| {}\n", y + 1);
+            render = format!("{render}| {}\n  |---+---+---+---+---+---+---+---|\n", y + 1);
         }
-        println!("{render}  A | B | C | D | E | F | H \n")
+        println!("{render}    A | B | C | D | E | F | G | H \n")
     }
 }
