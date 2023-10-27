@@ -12,6 +12,37 @@ pub enum Piece {
 }
 
 impl Piece {
+    #[inline]
+    pub fn is_king(&self) -> bool {
+        matches!(self, Self::King(_, _))
+    }
+
+    #[inline]
+    pub fn is_queen(&self) -> bool {
+        matches!(self, Self::Queen(_, _))
+    }
+
+    #[inline]
+    pub fn is_rook(&self) -> bool {
+        matches!(self, Self::Rook(_, _))
+    }
+
+    #[inline]
+    pub fn is_bishop(&self) -> bool {
+        matches!(self, Self::Bishop(_, _))
+    }
+
+    #[inline]
+    pub fn is_knight(&self) -> bool {
+        matches!(self, Self::Knight(_, _))
+    }
+
+    #[inline]
+    pub fn is_pawn(&self) -> bool {
+        matches!(self, Self::Pawn(_, _))
+    }
+
+    #[inline]
     pub fn get_color(&self) -> Color {
         match self {
             Piece::Pawn(color, _)
@@ -23,34 +54,35 @@ impl Piece {
         }
     }
 
-    pub fn is_king(&self) -> bool {
-        matches!(self, Self::King(_, _))
-    }
-
-    pub fn is_queen(&self) -> bool {
-        matches!(self, Self::Queen(_, _))
-    }
-
-    pub fn is_rook(&self) -> bool {
-        matches!(self, Self::Rook(_, _))
-    }
-
-    pub fn is_bishop(&self) -> bool {
-        matches!(self, Self::Bishop(_, _))
-    }
-
-    pub fn is_knight(&self) -> bool {
-        matches!(self, Self::Knight(_, _))
-    }
-
-    pub fn is_pawn(&self) -> bool {
-        matches!(self, Self::Pawn(_, _))
-    }
-
+    #[inline]
     pub fn opposing_color(&self) -> Color {
         match self.get_color() {
             Color::White => Color::Black,
             Color::Black => Color::White,
+        }
+    }
+
+    #[inline]
+    pub fn get_cooldown(&self) -> Duration {
+        match self {
+            Piece::Pawn(_, cd)
+            | Piece::Knight(_, cd)
+            | Piece::Bishop(_, cd)
+            | Piece::Rook(_, cd)
+            | Piece::Queen(_, cd)
+            | Piece::King(_, cd) => *cd,
+        }
+    }
+
+    #[inline]
+    pub fn set_cooldown(&mut self, cooldown: Duration) {
+        *self = match self {
+            Piece::Pawn(c, _) => Piece::Pawn(*c, cooldown),
+            Piece::Knight(c, _) => Piece::Knight(*c, cooldown),
+            Piece::Bishop(c, _) => Piece::Bishop(*c, cooldown),
+            Piece::Rook(c, _) => Piece::Rook(*c, cooldown),
+            Piece::Queen(c, _) => Piece::Queen(*c, cooldown),
+            Piece::King(c, _) => Piece::King(*c, cooldown),
         }
     }
 }

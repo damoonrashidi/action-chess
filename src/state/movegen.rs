@@ -41,7 +41,7 @@ impl<'board> MoveGen<'board> {
                             Piece::Queen(_, _) => gen.for_queen(&piece, &coord),
                             Piece::King(_, _) => gen.for_king(&piece, &coord),
                         };
-                        s.send(moves.clone()).unwrap();
+                        s.send(moves).unwrap();
                     });
                 }
             }
@@ -83,6 +83,9 @@ impl<'board> MoveGen<'board> {
     }
 
     pub fn for_pawn(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
+        if !piece.get_cooldown().is_zero() {
+            return vec![];
+        }
         let mut moves = vec![];
         let mut can_move_one = false;
         let (dir, start_rank, promotion_rank) = if piece.get_color() == Color::White {
@@ -146,6 +149,9 @@ impl<'board> MoveGen<'board> {
     }
 
     pub fn for_knight(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
+        if !piece.get_cooldown().is_zero() {
+            return vec![];
+        }
         let color = piece.get_color();
 
         let rank = pos.1 as i8;
@@ -180,6 +186,10 @@ impl<'board> MoveGen<'board> {
     }
 
     pub fn for_rook(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
+        if !piece.get_cooldown().is_zero() {
+            return vec![];
+        }
+
         let mut moves = vec![];
 
         [(-1, 0), (0, 1), (1, 0), (0, -1)]
@@ -209,6 +219,9 @@ impl<'board> MoveGen<'board> {
     }
 
     pub fn for_bishop(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
+        if !piece.get_cooldown().is_zero() {
+            return vec![];
+        }
         let mut moves = vec![];
 
         [(-1, -1), (-1, 1), (1, 1), (1, -1)]
@@ -245,6 +258,9 @@ impl<'board> MoveGen<'board> {
     }
 
     pub fn for_king(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
+        if !piece.get_cooldown().is_zero() {
+            return vec![];
+        }
         let mut natural_moves: Vec<Move> = (-1..=1)
             .flat_map(|i| (-1..=1).map(move |j| Coord(pos.0 + i, pos.1 + j)))
             .filter(|coord| coord.is_valid() && coord != pos)
