@@ -125,6 +125,13 @@ impl Board {
         })
     }
 
+    pub fn get_piece_count(&self) -> usize {
+        self.pieces
+            .into_iter()
+            .map(|row| row.iter().filter_map(|p| *p).count())
+            .sum()
+    }
+
     pub fn get_piece_at(&self, position: &Coord) -> &Option<Piece> {
         if !position.is_valid() {
             return &None;

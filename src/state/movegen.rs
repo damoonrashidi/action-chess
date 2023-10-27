@@ -1,3 +1,7 @@
+use std::sync::{mpsc::channel, Arc};
+
+use threadpool::ThreadPool;
+
 use super::{
     board::Board,
     coordinate::Coord,
@@ -15,48 +19,66 @@ impl<'board> MoveGen<'board> {
     }
 
     pub fn get_possible_moves(&self) -> Vec<Move> {
-        let mut moves = vec![];
+        let num_threads = self.board.get_piece_count();
+        let pool = ThreadPool::new(num_threads);
+        let board = Arc::new(self.board.clone());
+        let (s, r) = channel::<Vec<Move>>();
 
         for y in 0..8 {
             for x in 0..8 {
                 if let Some(piece) = self.board.pieces[y][x] {
                     let coord = Coord(x as i8, y as i8);
-                    match piece {
-                        Piece::Pawn(_) => moves.extend(&self.for_pawn(&piece, &coord)),
-                        Piece::Knight(_) => moves.extend(&self.for_knight(&piece, &coord)),
-                        Piece::Bishop(_) => moves.extend(&self.for_bishop(&piece, &coord)),
-                        Piece::Rook(_) => moves.extend(&self.for_rook(&piece, &coord)),
-                        Piece::Queen(_) => moves.extend(&self.for_queen(&piece, &coord)),
-                        Piece::King(_) => moves.extend(&self.for_king(&piece, &coord)),
-                    }
+                    let s = s.clone();
+                    let board = board.clone();
+                    pool.execute(move || {
+                        let gen = MoveGen::new(&board);
+                        let moves = match piece {
+                            Piece::Pawn(_) => gen.for_pawn(&piece, &coord),
+                            Piece::Knight(_) => gen.for_knight(&piece, &coord),
+                            Piece::Bishop(_) => gen.for_bishop(&piece, &coord),
+                            Piece::Rook(_) => gen.for_rook(&piece, &coord),
+                            Piece::Queen(_) => gen.for_queen(&piece, &coord),
+                            Piece::King(_) => gen.for_king(&piece, &coord),
+                        };
+                        s.send(moves.clone()).unwrap();
+                    });
                 }
             }
         }
 
-        moves
+        r.iter().take(num_threads).flatten().collect()
     }
 
     pub fn get_possible_moves_for_color(&self, color: Color) -> Vec<Move> {
-        let mut moves = vec![];
+        let num_pieces_with_color: usize = self.board.get_piece_count();
+        let pool = ThreadPool::new(num_pieces_with_color);
+        let (s, r) = channel::<Vec<Move>>();
+        let board = Arc::new(self.board.clone());
 
         for y in 0..8 {
             for x in 0..8 {
                 if let Some(piece) = self.board.pieces[y][x] {
-                    let coord = Coord(x as i8, y as i8);
-                    match (piece, color == piece.get_color()) {
-                        (Piece::Pawn(_), true) => moves.extend(&self.for_pawn(&piece, &coord)),
-                        (Piece::Knight(_), true) => moves.extend(&self.for_knight(&piece, &coord)),
-                        (Piece::Bishop(_), true) => moves.extend(&self.for_bishop(&piece, &coord)),
-                        (Piece::Rook(_), true) => moves.extend(&self.for_rook(&piece, &coord)),
-                        (Piece::Queen(_), true) => moves.extend(&self.for_queen(&piece, &coord)),
-                        (Piece::King(_), true) => moves.extend(&self.for_king(&piece, &coord)),
-                        _ => {}
-                    }
+                    let s = s.clone();
+                    let board = board.clone();
+                    pool.execute(move || {
+                        let coord = Coord(x as i8, y as i8);
+                        let gen = MoveGen::new(&board);
+                        let moves = match (piece, color == piece.get_color()) {
+                            (Piece::Pawn(_), true) => gen.for_pawn(&piece, &coord),
+                            (Piece::Knight(_), true) => gen.for_knight(&piece, &coord),
+                            (Piece::Bishop(_), true) => gen.for_bishop(&piece, &coord),
+                            (Piece::Rook(_), true) => gen.for_rook(&piece, &coord),
+                            (Piece::Queen(_), true) => gen.for_queen(&piece, &coord),
+                            (Piece::King(_), true) => gen.for_king(&piece, &coord),
+                            _ => vec![],
+                        };
+                        s.send(moves).unwrap();
+                    });
                 }
             }
         }
 
-        moves
+        r.iter().take(num_pieces_with_color).flatten().collect()
     }
 
     pub fn for_pawn(&self, piece: &Piece, pos: &Coord) -> Vec<Move> {
