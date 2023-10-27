@@ -2,6 +2,7 @@
 mod tests {
     use crate::state::{
         board::Board,
+        cooldowns::*,
         piece::{Color::*, Piece},
         square::*,
     };
@@ -24,7 +25,7 @@ mod tests {
     #[test]
     fn get_all_black_pawns() {
         let board = Board::new();
-        let black_pawns = board.filter_by_piece(Piece::Pawn(Black));
+        let black_pawns = board.filter_by_piece(Piece::Pawn(Black, COOLDOWN_PAWN));
         assert_eq!(black_pawns.pieces.len(), 8);
     }
 
@@ -46,10 +47,22 @@ mod tests {
     fn custom_fen() {
         let board =
             Board::from_fen("r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 w qQ - 0 0").unwrap();
-        assert_eq!(board.get_piece_at(&A8), &Some(Piece::Rook(Black)));
-        assert_eq!(board.get_piece_at(&H8), &Some(Piece::Rook(Black)));
-        assert_eq!(board.get_piece_at(&A1), &Some(Piece::Queen(Black)));
-        assert_eq!(board.get_piece_at(&E2), &Some(Piece::King(White)));
+        assert_eq!(
+            board.get_piece_at(&A8),
+            &Some(Piece::Rook(Black, COOLDOWN_ROOK))
+        );
+        assert_eq!(
+            board.get_piece_at(&H8),
+            &Some(Piece::Rook(Black, COOLDOWN_ROOK))
+        );
+        assert_eq!(
+            board.get_piece_at(&A1),
+            &Some(Piece::Queen(Black, COOLDOWN_QUEEN))
+        );
+        assert_eq!(
+            board.get_piece_at(&E2),
+            &Some(Piece::King(White, COOLDOWN_KING))
+        );
         assert!(!board.white_can_castle_kingside);
         assert!(board.white_can_castle_queenside);
         assert!(!board.black_can_castle_kingside);

@@ -1,15 +1,14 @@
 use super::{
+    cooldowns::*,
     coordinate::Coord,
     piece::{Color, Move, Piece},
 };
 use core::fmt;
-use std::{fmt::Debug, time::Duration};
+use std::fmt::Debug;
 
 #[derive(Debug, Clone, Default)]
-#[allow(unused)]
 pub struct Board {
     pub pieces: [[Option<Piece>; 8]; 8],
-    pub cooldowns: Vec<(usize, Duration)>,
 
     pub white_can_castle_kingside: bool,
     pub white_can_castle_queenside: bool,
@@ -17,39 +16,37 @@ pub struct Board {
     pub black_can_castle_queenside: bool,
 }
 
-#[allow(unused)]
-impl<'piece> Board {
+impl Board {
     pub fn new() -> Self {
         let mut pieces: [[Option<Piece>; 8]; 8] = [[None; 8]; 8];
 
-        pieces[1] = [Some(Piece::Pawn(Color::White)); 8];
-        pieces[6] = [Some(Piece::Pawn(Color::Black)); 8];
+        pieces[1] = [Some(Piece::Pawn(Color::White, COOLDOWN_PAWN)); 8];
+        pieces[6] = [Some(Piece::Pawn(Color::Black, COOLDOWN_PAWN)); 8];
 
         pieces[0] = [
-            Some(Piece::Rook(Color::White)),
-            Some(Piece::Knight(Color::White)),
-            Some(Piece::Bishop(Color::White)),
-            Some(Piece::Queen(Color::White)),
-            Some(Piece::King(Color::White)),
-            Some(Piece::Bishop(Color::White)),
-            Some(Piece::Knight(Color::White)),
-            Some(Piece::Rook(Color::White)),
+            Some(Piece::Rook(Color::White, COOLDOWN_ROOK)),
+            Some(Piece::Knight(Color::White, COOLDOWN_KNIGHT)),
+            Some(Piece::Bishop(Color::White, COOLDOWN_BISHOP)),
+            Some(Piece::Queen(Color::White, COOLDOWN_QUEEN)),
+            Some(Piece::King(Color::White, COOLDOWN_KING)),
+            Some(Piece::Bishop(Color::White, COOLDOWN_BISHOP)),
+            Some(Piece::Knight(Color::White, COOLDOWN_KNIGHT)),
+            Some(Piece::Rook(Color::White, COOLDOWN_ROOK)),
         ];
 
         pieces[7] = [
-            Some(Piece::Rook(Color::Black)),
-            Some(Piece::Knight(Color::Black)),
-            Some(Piece::Bishop(Color::Black)),
-            Some(Piece::Queen(Color::Black)),
-            Some(Piece::King(Color::Black)),
-            Some(Piece::Bishop(Color::Black)),
-            Some(Piece::Knight(Color::Black)),
-            Some(Piece::Rook(Color::Black)),
+            Some(Piece::Rook(Color::Black, COOLDOWN_ROOK)),
+            Some(Piece::Knight(Color::Black, COOLDOWN_KNIGHT)),
+            Some(Piece::Bishop(Color::Black, COOLDOWN_BISHOP)),
+            Some(Piece::Queen(Color::Black, COOLDOWN_QUEEN)),
+            Some(Piece::King(Color::Black, COOLDOWN_KING)),
+            Some(Piece::Bishop(Color::Black, COOLDOWN_BISHOP)),
+            Some(Piece::Knight(Color::Black, COOLDOWN_KNIGHT)),
+            Some(Piece::Rook(Color::Black, COOLDOWN_ROOK)),
         ];
 
         Self {
             pieces,
-            cooldowns: vec![],
             white_can_castle_kingside: true,
             white_can_castle_queenside: true,
             black_can_castle_kingside: true,
@@ -72,7 +69,7 @@ impl<'piece> Board {
 
             if ('0'..'8').contains(&c) {
                 if let Ok(empties) = c.to_string().parse::<usize>() {
-                    for i in 0..empties {
+                    for _ in 0..empties {
                         pieces[rank][file] = None;
                         file += 1;
                         continue;
@@ -80,18 +77,18 @@ impl<'piece> Board {
                 }
             }
             let piece = match c {
-                'p' => Some(Piece::Pawn(Color::Black)),
-                'b' => Some(Piece::Bishop(Color::Black)),
-                'n' => Some(Piece::Knight(Color::Black)),
-                'r' => Some(Piece::Rook(Color::Black)),
-                'q' => Some(Piece::Queen(Color::Black)),
-                'k' => Some(Piece::King(Color::Black)),
-                'P' => Some(Piece::Pawn(Color::White)),
-                'B' => Some(Piece::Bishop(Color::White)),
-                'N' => Some(Piece::Knight(Color::White)),
-                'R' => Some(Piece::Rook(Color::White)),
-                'Q' => Some(Piece::Queen(Color::White)),
-                'K' => Some(Piece::King(Color::White)),
+                'p' => Some(Piece::Pawn(Color::Black, COOLDOWN_PAWN)),
+                'b' => Some(Piece::Bishop(Color::Black, COOLDOWN_BISHOP)),
+                'n' => Some(Piece::Knight(Color::Black, COOLDOWN_KNIGHT)),
+                'r' => Some(Piece::Rook(Color::Black, COOLDOWN_ROOK)),
+                'q' => Some(Piece::Queen(Color::Black, COOLDOWN_QUEEN)),
+                'k' => Some(Piece::King(Color::Black, COOLDOWN_KING)),
+                'P' => Some(Piece::Pawn(Color::White, COOLDOWN_PAWN)),
+                'B' => Some(Piece::Bishop(Color::White, COOLDOWN_BISHOP)),
+                'N' => Some(Piece::Knight(Color::White, COOLDOWN_KNIGHT)),
+                'R' => Some(Piece::Rook(Color::White, COOLDOWN_ROOK)),
+                'Q' => Some(Piece::Queen(Color::White, COOLDOWN_QUEEN)),
+                'K' => Some(Piece::King(Color::White, COOLDOWN_KING)),
                 _ => None,
             };
             if file < 8 {
@@ -120,7 +117,6 @@ impl<'piece> Board {
 
         Some(Board {
             pieces,
-            cooldowns: vec![],
             white_can_castle_kingside: white_kingside,
             white_can_castle_queenside: white_queenside,
             black_can_castle_kingside: black_kingside,
@@ -150,9 +146,7 @@ impl<'piece> Board {
         for y in 0..8 {
             for x in 0..8 {
                 if let Some(target) = self.pieces[y][x] {
-                    if std::mem::discriminant(&target) == std::mem::discriminant(piece)
-                        && piece.get_color() == target.get_color()
-                    {
+                    if piece == &target {
                         self.pieces[y][x] = None;
                     }
                 }
@@ -229,15 +223,15 @@ impl<'piece> Board {
                 }
                 self.pieces[src_file][4] = None;
                 self.pieces[src_file][7] = None;
-                self.pieces[src_file][6] = Some(Piece::King(color));
-                self.pieces[src_file][5] = Some(Piece::Rook(color));
+                self.pieces[src_file][6] = Some(Piece::King(color, COOLDOWN_KING));
+                self.pieces[src_file][5] = Some(Piece::Rook(color, COOLDOWN_ROOK));
             }
             Move::QueenSideCastle(color) => {
                 let src_file = if color == Color::White { 0 } else { 7 };
                 self.pieces[src_file][4] = None;
                 self.pieces[src_file][0] = None;
-                self.pieces[src_file][2] = Some(Piece::King(color));
-                self.pieces[src_file][2] = Some(Piece::Rook(color));
+                self.pieces[src_file][2] = Some(Piece::King(color, COOLDOWN_KING));
+                self.pieces[src_file][2] = Some(Piece::Rook(color, COOLDOWN_ROOK));
             }
             Move::Promotion(src, dest, piece) => {
                 self.pieces[src.1 as usize][src.0 as usize] = None;
@@ -251,8 +245,12 @@ impl<'piece> Board {
     pub fn get_coord_for_piece(&self, piece: &Piece) -> Option<Coord> {
         for y in 0..8 {
             for x in 0..8 {
-                if self.pieces[y][x] == Some(*piece) {
-                    return Some(Coord(x as i8, y as i8));
+                if let Some(target) = self.pieces[y][x] {
+                    if std::mem::discriminant(&target) == std::mem::discriminant(piece)
+                        && target.get_color() == piece.get_color()
+                    {
+                        return Some(Coord(x as i8, y as i8));
+                    }
                 }
             }
         }

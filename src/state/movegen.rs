@@ -4,6 +4,7 @@ use threadpool::ThreadPool;
 
 use super::{
     board::Board,
+    cooldowns::*,
     coordinate::Coord,
     piece::{Move, Piece},
 };
@@ -33,12 +34,12 @@ impl<'board> MoveGen<'board> {
                     pool.execute(move || {
                         let gen = MoveGen::new(&board);
                         let moves = match piece {
-                            Piece::Pawn(_) => gen.for_pawn(&piece, &coord),
-                            Piece::Knight(_) => gen.for_knight(&piece, &coord),
-                            Piece::Bishop(_) => gen.for_bishop(&piece, &coord),
-                            Piece::Rook(_) => gen.for_rook(&piece, &coord),
-                            Piece::Queen(_) => gen.for_queen(&piece, &coord),
-                            Piece::King(_) => gen.for_king(&piece, &coord),
+                            Piece::Pawn(_, _) => gen.for_pawn(&piece, &coord),
+                            Piece::Knight(_, _) => gen.for_knight(&piece, &coord),
+                            Piece::Bishop(_, _) => gen.for_bishop(&piece, &coord),
+                            Piece::Rook(_, _) => gen.for_rook(&piece, &coord),
+                            Piece::Queen(_, _) => gen.for_queen(&piece, &coord),
+                            Piece::King(_, _) => gen.for_king(&piece, &coord),
                         };
                         s.send(moves.clone()).unwrap();
                     });
@@ -64,12 +65,12 @@ impl<'board> MoveGen<'board> {
                         let coord = Coord(x as i8, y as i8);
                         let gen = MoveGen::new(&board);
                         let moves = match (piece, color == piece.get_color()) {
-                            (Piece::Pawn(_), true) => gen.for_pawn(&piece, &coord),
-                            (Piece::Knight(_), true) => gen.for_knight(&piece, &coord),
-                            (Piece::Bishop(_), true) => gen.for_bishop(&piece, &coord),
-                            (Piece::Rook(_), true) => gen.for_rook(&piece, &coord),
-                            (Piece::Queen(_), true) => gen.for_queen(&piece, &coord),
-                            (Piece::King(_), true) => gen.for_king(&piece, &coord),
+                            (Piece::Pawn(_, _), true) => gen.for_pawn(&piece, &coord),
+                            (Piece::Knight(_, _), true) => gen.for_knight(&piece, &coord),
+                            (Piece::Bishop(_, _), true) => gen.for_bishop(&piece, &coord),
+                            (Piece::Rook(_, _), true) => gen.for_rook(&piece, &coord),
+                            (Piece::Queen(_, _), true) => gen.for_queen(&piece, &coord),
+                            (Piece::King(_, _), true) => gen.for_king(&piece, &coord),
                             _ => vec![],
                         };
                         s.send(moves).unwrap();
@@ -250,7 +251,7 @@ impl<'board> MoveGen<'board> {
             .filter(|coord| {
                 if let Some(opposing_king_pos) = self
                     .board
-                    .get_coord_for_piece(&Piece::King(piece.opposing_color()))
+                    .get_coord_for_piece(&Piece::King(piece.opposing_color(), COOLDOWN_KING))
                 {
                     let file_distance = (opposing_king_pos.0 - coord.0).abs();
                     let rank_distance = (opposing_king_pos.1 - coord.1).abs();
@@ -267,7 +268,7 @@ impl<'board> MoveGen<'board> {
             .filter(|coord| {
                 let mut enemy_board = self.board.filter_by_color(piece.opposing_color());
                 enemy_board.set_piece_at(Some(*piece), *coord);
-                enemy_board.remove_by_piece(&Piece::King(piece.opposing_color()));
+                enemy_board.remove_by_piece(&Piece::King(piece.opposing_color(), COOLDOWN_KING));
                 let movegen = MoveGen::new(&enemy_board);
                 let enemy_moves = movegen.get_possible_moves_for_color(piece.opposing_color());
                 let enemy_can_capture_at_coord = enemy_moves
@@ -310,7 +311,7 @@ impl<'board> MoveGen<'board> {
                 lane_is_open,
                 king_is_starting_position,
             ) {
-                if target == &Piece::Rook(piece.get_color()) {
+                if target == &Piece::Rook(piece.get_color(), COOLDOWN_ROOK) {
                     natural_moves.push(Move::KingSideCastle(piece.get_color()));
                 }
             }
@@ -327,7 +328,7 @@ impl<'board> MoveGen<'board> {
                 lane_is_open,
                 king_is_starting_position,
             ) {
-                if target == &Piece::Rook(piece.get_color()) {
+                if target == &Piece::Rook(piece.get_color(), COOLDOWN_ROOK) {
                     natural_moves.push(Move::QueenSideCastle(piece.get_color()));
                 }
             }
@@ -340,7 +341,7 @@ impl<'board> MoveGen<'board> {
         let mut board = self.board.filter_by_color(piece.opposing_color());
         let king_pos = self
             .board
-            .get_coord_for_piece(&Piece::King(piece.get_color()));
+            .get_coord_for_piece(&Piece::King(piece.get_color(), COOLDOWN_KING));
         if king_pos.is_none() {
             return false;
         }
@@ -365,10 +366,10 @@ impl<'board> MoveGen<'board> {
 
     fn all_promotions_at_pos(from: &Coord, to: &Coord, piece: &Piece) -> Vec<Move> {
         [
-            Piece::Queen(piece.get_color()),
-            Piece::Rook(piece.get_color()),
-            Piece::Bishop(piece.get_color()),
-            Piece::Knight(piece.get_color()),
+            Piece::Queen(piece.get_color(), COOLDOWN_QUEEN),
+            Piece::Rook(piece.get_color(), COOLDOWN_ROOK),
+            Piece::Bishop(piece.get_color(), COOLDOWN_BISHOP),
+            Piece::Knight(piece.get_color(), COOLDOWN_KNIGHT),
         ]
         .into_iter()
         .map(|p| Move::Promotion(*from, *to, p))
