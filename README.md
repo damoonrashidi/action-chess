@@ -4,11 +4,36 @@ Action chess is the same chess you know and love, with castling, en passant, pro
 
 ## Things that are done
 
-- [x] Render a board
+- [x] Render a board in the terminal
 - [x] Move pieces about
-- [x] render board in terminal
 - [x] Find a list of legal moves
-
+  - [x] pinned pieces
+  - [x] pawn
+    - [x] move once
+    - [x] double move from starting position
+    - [x] captures
+    - [x] promotions
+    - [x] promotion captures
+  - [x] rook
+    - [x] moves
+    - [x] captures
+    - [x] castling
+  - [x] bishop
+    - [x] moves
+    - [x] captures
+  - [x] knight
+    - [x] moves
+    - [x] captures
+  - [x] queen
+    - [x] moves
+    - [x] captures
+  - [x] king
+    - [x] moves
+    - [x] captures
+    - [x] cannot move into check
+    - [x] castling
+  
+ 
 ## What isn't yet implemented but being worked on
 
 - [ ] Networking

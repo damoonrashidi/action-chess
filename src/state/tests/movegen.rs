@@ -129,8 +129,6 @@ mod tests {
         let board = Board::from_fen("8/8/KR5r/8/8/8/8/8 b - - 0 0").unwrap();
         let gen = MoveGen::new(&board);
         let moves = gen.for_rook(&Piece::Pawn(White), &B6);
-        println!("{board}");
-        MoveGen::render_movelist(&board, &moves);
         assert_eq!(moves.len(), 6);
     }
 
@@ -149,7 +147,6 @@ mod tests {
         let gen = MoveGen::new(&board);
         let moves = gen.for_knight(&Piece::Knight(White), &G1);
         let expected_moves = vec![H3, F3];
-        MoveGen::render_movelist(&board, &moves);
 
         assert!(move_lists_has_all_targets(G1, &expected_moves, &moves));
     }
