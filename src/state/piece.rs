@@ -1,6 +1,8 @@
 use crate::state::coordinate::Coord;
 use std::{fmt::Display, time::Duration};
 
+use super::cooldowns::*;
+
 #[derive(Clone, Copy, Debug)]
 pub enum Piece {
     Pawn(Color, Duration),
@@ -83,6 +85,18 @@ impl Piece {
             Piece::Rook(c, _) => Piece::Rook(*c, cooldown),
             Piece::Queen(c, _) => Piece::Queen(*c, cooldown),
             Piece::King(c, _) => Piece::King(*c, cooldown),
+        }
+    }
+
+    #[inline]
+    pub fn std_piece_cooldown(piece: &Piece) -> Duration {
+        match piece {
+            Piece::Pawn(_, _) => COOLDOWN_PAWN,
+            Piece::Knight(_, _) => COOLDOWN_KNIGHT,
+            Piece::Bishop(_, _) => COOLDOWN_BISHOP,
+            Piece::Rook(_, _) => COOLDOWN_ROOK,
+            Piece::Queen(_, _) => COOLDOWN_QUEEN,
+            Piece::King(_, _) => COOLDOWN_KING,
         }
     }
 }
