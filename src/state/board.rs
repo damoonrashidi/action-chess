@@ -237,9 +237,8 @@ impl Board {
                 self.pieces[src_file][2] = Some(Piece::King(color, COOLDOWN_KING));
                 self.pieces[src_file][2] = Some(Piece::Rook(color, COOLDOWN_ROOK));
             }
-            Move::Promotion(src, dest, mut piece) => {
+            Move::Promotion(src, dest, piece) => {
                 self.pieces[src.1 as usize][src.0 as usize] = None;
-                piece.set_cooldown(Piece::std_piece_cooldown(&piece));
                 self.pieces[dest.1 as usize][dest.0 as usize] = Some(piece);
             }
         }

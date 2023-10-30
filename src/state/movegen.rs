@@ -9,6 +9,7 @@ use super::{
     piece::{Move, Piece},
 };
 use crate::state::piece::Color;
+use colored::*;
 
 pub struct MoveGen<'board> {
     board: &'board Board,
@@ -407,14 +408,32 @@ impl<'board> MoveGen<'board> {
         for y in (0..8).rev() {
             render = format!("\n{render}{} ", y + 1);
             for x in 0..8 {
-                match (
+                render = match (
                     board.pieces[y][x],
                     targets.contains(&Coord(x as i8, y as i8)),
                 ) {
-                    (None, true) => render = format!("{render}| o "),
-                    (None, false) => render = format!("{render}|   "),
-                    (Some(_), true) => render = format!("{render}| x "),
-                    (Some(p), false) => render = format!("{render}| {p} "),
+                    (None, true) => format!("{render}| o "),
+                    (None, false) => format!("{render}|   "),
+                    (Some(p), true) => {
+                        format!(
+                            "{render}|{}{}{}",
+                            " ".on_yellow(),
+                            p.to_string().on_yellow(),
+                            " ".to_string().on_yellow()
+                        )
+                    }
+                    (Some(p), false) => {
+                        if !p.get_cooldown().is_zero() {
+                            format!(
+                                "{render}|{}{}{}",
+                                " ".on_red(),
+                                p.to_string().on_red(),
+                                " ".on_red()
+                            )
+                        } else {
+                            format!("{render}| {p} ")
+                        }
+                    }
                 }
             }
             render = format!("{render}| {}\n  |---+---+---+---+---+---+---+---|\n", y + 1);
