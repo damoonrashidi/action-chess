@@ -11,14 +11,6 @@ struct ClientState {
     game: GameState,
 }
 
-impl ClientState {
-    pub fn new() -> Self {
-        ClientState {
-            game: GameState::new(),
-        }
-    }
-}
-
 fn setup(_c: &mut EngineContext) {
     set_main_camera_zoom(12.);
     let mut camera = main_camera_mut();

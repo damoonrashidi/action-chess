@@ -37,7 +37,7 @@ mod tests {
 
         assert!(move_lists_has_all_targets(
             E5,
-            &vec![D4, D5, D6, E4, E6, F4, F5, F6],
+            &[D4, D5, D6, E4, E6, F4, F5, F6],
             &moves
         ));
     }
@@ -50,7 +50,7 @@ mod tests {
 
         assert!(move_lists_has_all_targets(
             B2,
-            &vec![A1, B3, C2, C3],
+            &[A1, B3, C2, C3],
             &moves
         ));
         assert_eq!(moves.len(), 4);

@@ -158,8 +158,8 @@ impl Board {
 
     pub fn filter_by_piece(&self, piece: Piece) -> Board {
         let mut pieces = [[None; 8]; 8];
-        for y in 0..8 {
-            for x in 0..8 {
+        (0..8).for_each(|y| {
+            (0..8).for_each(|x| {
                 pieces[y][x] = match (piece, self.pieces[y][x]) {
                     (_, None) => None,
                     (comp, Some(target)) => {
@@ -170,8 +170,8 @@ impl Board {
                         }
                     }
                 };
-            }
-        }
+            });
+        });
 
         Board {
             pieces,
@@ -182,8 +182,8 @@ impl Board {
     pub fn filter_by_color(&self, color: Color) -> Board {
         let mut pieces = [[None; 8]; 8];
 
-        for y in 0..8 {
-            for x in 0..8 {
+        (0..8).for_each(|y| {
+            (0..8).for_each(|x| {
                 pieces[y][x] = match (color, self.pieces[y][x]) {
                     (_, None) => None,
                     (comp, Some(target)) => {
@@ -194,8 +194,8 @@ impl Board {
                         }
                     }
                 };
-            }
-        }
+            });
+        });
 
         Board {
             pieces,
