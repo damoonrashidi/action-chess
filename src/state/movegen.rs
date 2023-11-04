@@ -107,7 +107,7 @@ impl<'board> MoveGen<'board> {
         ) {
             if target.get_color() != piece.get_color() {
                 if left_capture.1 == promotion_rank {
-                    moves.extend(MoveGen::all_promotions_at_pos(pos, &left_capture, &piece));
+                    moves.extend(MoveGen::all_promotions_at_pos(pos, &left_capture, piece));
                 } else {
                     moves.push(Move::Piece(*pos, left_capture));
                 }
@@ -120,7 +120,7 @@ impl<'board> MoveGen<'board> {
         ) {
             if target.get_color() != piece.get_color() {
                 if right_capture.1 == promotion_rank {
-                    moves.extend(MoveGen::all_promotions_at_pos(pos, &right_capture, &piece));
+                    moves.extend(MoveGen::all_promotions_at_pos(pos, &right_capture, piece));
                 } else {
                     moves.push(Move::Piece(*pos, right_capture));
                 }
@@ -131,7 +131,7 @@ impl<'board> MoveGen<'board> {
         if forward.is_valid() && self.board.get_piece_at(&forward).is_none() {
             can_move_one = true;
             if forward.1 == promotion_rank {
-                moves.extend(MoveGen::all_promotions_at_pos(pos, &forward, &piece));
+                moves.extend(MoveGen::all_promotions_at_pos(pos, &forward, piece));
             } else {
                 moves.push(Move::Piece(*pos, forward));
             }
@@ -155,8 +155,8 @@ impl<'board> MoveGen<'board> {
         }
         let color = piece.get_color();
 
-        let rank = pos.1 as i8;
-        let file = pos.0 as i8;
+        let rank = pos.1;
+        let file = pos.0;
 
         [
             (file - 1, rank - 2),
@@ -175,7 +175,7 @@ impl<'board> MoveGen<'board> {
                 return false;
             }
 
-            if let Some(piece) = self.board.get_piece_at(&coord) {
+            if let Some(piece) = self.board.get_piece_at(coord) {
                 return piece.get_color() != color;
             }
 
@@ -397,7 +397,7 @@ impl<'board> MoveGen<'board> {
         let mut render = String::from("    A | B | C | D | E | F | G | H \n");
         render = format!("{render}  |---+---+---+---+---+---+---+---|\n");
         let targets: Vec<Coord> = moves
-            .into_iter()
+            .iter()
             .filter_map(|m| match m {
                 Move::Piece(_, target) => Some(*target),
                 Move::Promotion(_, target, _) => Some(*target),
