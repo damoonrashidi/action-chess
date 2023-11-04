@@ -3,29 +3,7 @@ use crate::state::{
     piece::{Color, Move, Piece},
 };
 
-// A command is 4 bytes.
-// first byte is reserved for the move
-//      if move is Piece (0)
-//          the second byte the from coord represented as as a value 0..64 -> translated to (file, rank)
-//          the third byte is the to coord represented as as a value 0..64 -> translated to (file, rank)
-//          the fourth byte is empty buffer byte
-//      if move is Promotion (1)
-//          the second byte is the from coord
-//          the third byte is the to coord
-//          the fourth byte is the from promotion piece -> represented
-//      if move is king_side_castle (10)
-//          the second byte is color
-//          the third byte is empty buffer
-//          the fourth byte is empty buffer
-//      if move is queen_side_castle (11)
-//          the second byte is color
-//          the third byte is empty buffer
-//          the fourth byte is empty buffer
-
-#[derive(Debug, PartialEq)]
-pub struct Command(pub [u8; 4]);
-
-const EMPTY_BUFFER: u8 = 0b0000_0000;
+const BUFFER_BYTE: u8 = 0b0000_0000;
 
 const COLOR_WHITE: u8 = 0b0000_0000;
 const COLOR_BLACK: u8 = 0b0000_0001;
@@ -41,6 +19,73 @@ const MOVE_PIECE: u8 = 0b0000_0000;
 const MOVE_PROMOTION: u8 = 0b0000_0001;
 const MOVE_KING_SIDE_CASTLE: u8 = 0b0000_0010;
 const MOVE_QUEEN_SIDE_CASTLE: u8 = 0b0000_0011;
+
+/**
+A command is 4 bytes represented by a `[u8; 4]`.
+This is all data needed to represent a move, and thus will be all that is sent over the wire during a game.
+
+The first byte indicatates what kind of move it is.
+
+0. Piece
+1. Promotion
+2. King Side Castle
+3. Queen Side Castle
+
+### In the case of (0) Piece.
+The second byte is the "from" `Coord` in the format u8 0..64 translated to (file, rank)
+The third byte is the "to" `Coord` in the format u8 0..64 translated to (file, rank)
+The fourth byte is an EMPTY buffer byte
+
+### In the case of (1) Promotion:
+
+The second byte is the "from" `Coord` sent as a u8 0..64 translated to (file, rank).
+
+The third byte is the "to" `Coord` sent as a u8 0..64 translated to (file, rank).
+
+The forth byte is a u8 representing a Piece where the 4 most significant bits are a piece representation.
+
+```markdown
+Pawn = 1
+Knight = 2
+Bishop = 3
+Rook = 4
+Queen = 5
+King = 6
+```
+**Note: Pawn and King promotions are illegal moves.**
+
+The four least significant bits are a color representation:
+```markdown
+0 = White
+1 = Black
+```
+Thus `0b0101_0001` is a black queen.
+
+### In the case of (2) King Side Castle
+
+The second byte is color, signified by the least important bit:
+```markdown
+0 = White
+1 = Black
+```
+The third byte is an EMPTY buffer byte.
+
+The fourth byte is an EMPTY buffer byte.
+
+### In the case of (2) Queen Side Castle
+
+The second byte is color, signified by the least important bit:
+```markdown
+0 = White
+1 = Black
+```
+The third byte is an EMPTY buffer byte.
+
+The fourth byte is an EMPTY buffer byte.
+
+*/
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub struct Command(pub [u8; 4]);
 
 impl From<Piece> for u8 {
     fn from(value: Piece) -> Self {
@@ -90,21 +135,21 @@ impl From<u8> for Coord {
 impl From<Move> for Command {
     fn from(value: Move) -> Self {
         match value {
-            Move::Piece(from, to) => Command([MOVE_PIECE, from.into(), to.into(), EMPTY_BUFFER]),
+            Move::Piece(from, to) => Command([MOVE_PIECE, from.into(), to.into(), BUFFER_BYTE]),
             Move::Promotion(from, to, piece) => {
                 Command([MOVE_PROMOTION, from.into(), to.into(), piece.into()])
             }
             Move::KingSideCastle(color) => Command([
                 MOVE_KING_SIDE_CASTLE,
                 color.into(),
-                EMPTY_BUFFER,
-                EMPTY_BUFFER,
+                BUFFER_BYTE,
+                BUFFER_BYTE,
             ]),
             Move::QueenSideCastle(color) => Command([
                 MOVE_QUEEN_SIDE_CASTLE,
                 color.into(),
-                EMPTY_BUFFER,
-                EMPTY_BUFFER,
+                BUFFER_BYTE,
+                BUFFER_BYTE,
             ]),
         }
     }
