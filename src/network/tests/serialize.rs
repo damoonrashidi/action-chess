@@ -4,22 +4,18 @@ mod test {
 
     #[test]
     fn coord_into_u8() {
-        [(A1, 0), (A2, 8), (H8, 63)]
-            .into_iter()
-            .for_each(|(coord, expected)| {
-                let actual: u8 = coord.into();
-                assert_eq!(actual, expected);
-            });
+        for (coord, expected) in [(A1, 0), (A2, 8), (H8, 63)] {
+            let actual: u8 = coord.into();
+            assert_eq!(actual, expected);
+        }
     }
 
     #[test]
     fn u8_into_coord() {
-        [(A1, 0), (A2, 8), (H8, 63)]
-            .into_iter()
-            .for_each(|(expected, index)| {
-                let actual: Coord = index.into();
-                assert_eq!(actual, expected);
-            });
+        for (expected, index) in [(A1, 0), (A2, 8), (H8, 63)] {
+            let actual: Coord = index.into();
+            assert_eq!(actual, expected);
+        }
     }
 
     // #[test]

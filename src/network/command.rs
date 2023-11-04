@@ -70,7 +70,9 @@ impl From<Color> for u8 {
 
 impl From<Coord> for u8 {
     fn from(value: Coord) -> Self {
+        #[allow(clippy::cast_sign_loss)]
         let file = value.0 as u8;
+        #[allow(clippy::cast_sign_loss)]
         let rank = value.1 as u8;
         rank * 8 + file
     }
@@ -80,6 +82,7 @@ impl From<u8> for Coord {
     fn from(value: u8) -> Self {
         let file = value % 8;
         let rank = value / 8;
+        #[allow(clippy::cast_possible_wrap)]
         Coord(file as i8, rank as i8)
     }
 }
