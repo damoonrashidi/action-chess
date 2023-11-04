@@ -128,7 +128,7 @@ impl Display for Move {
             Move::KingSideCastle(_) => "o-o".into(),
             Move::QueenSideCastle(_) => "o-o-o".into(),
             Move::Piece(from, to) => format!("{from} -> {to}"),
-            Move::Promotion(_, to, piece) => format!("{to}={piece}"),
+            Move::Promotion(from, to, piece) => format!("{from} -> {to}={piece}"),
         };
 
         write!(f, "{mv}")

@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod test {
     use std::time::Duration;
 
     use crate::state::{
@@ -48,11 +48,7 @@ mod tests {
         board.set_piece_at(Some(Piece::Rook(Black, Duration::ZERO)), A1);
         let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), &B2);
 
-        assert!(move_lists_has_all_targets(
-            B2,
-            &[A1, B3, C2, C3],
-            &moves
-        ));
+        assert!(move_lists_has_all_targets(B2, &[A1, B3, C2, C3], &moves));
         assert_eq!(moves.len(), 4);
     }
 
