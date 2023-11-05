@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod test {
+mod get_piece_information {
     use crate::state::piece::{Color, Piece};
 
     #[test]
