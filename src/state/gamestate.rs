@@ -1,8 +1,6 @@
-use hecs::Bundle;
-
 use super::board::Board;
 
-#[derive(Debug, Clone, Bundle)]
+#[derive(Debug, Clone)]
 pub struct GameState {
     pub board: Board,
 }

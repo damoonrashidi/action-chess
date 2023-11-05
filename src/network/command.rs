@@ -1,5 +1,8 @@
 use crate::state::{
-    cooldowns::*,
+    cooldowns::{
+        COOLDOWN_BISHOP, COOLDOWN_KING, COOLDOWN_KNIGHT, COOLDOWN_PAWN, COOLDOWN_QUEEN,
+        COOLDOWN_ROOK,
+    },
     coordinate::Coord,
     piece::{Color, Move, Piece},
 };
@@ -195,23 +198,23 @@ impl From<Command> for Move {
         let bytes = value.0;
 
         match bytes {
-            [MOVE_PIECE, _, _, _] => decode_move(&bytes),
-            [MOVE_PROMOTION, _, _, _] => decode_promotion(&bytes),
-            [MOVE_KING_SIDE_CASTLE, _, _, _] => decode_ksc(&bytes),
-            [MOVE_QUEEN_SIDE_CASTLE, _, _, _] => decode_qsc(&bytes),
+            [MOVE_PIECE, _, _, _] => decode_move(bytes),
+            [MOVE_PROMOTION, _, _, _] => decode_promotion(bytes),
+            [MOVE_KING_SIDE_CASTLE, _, _, _] => decode_ksc(bytes),
+            [MOVE_QUEEN_SIDE_CASTLE, _, _, _] => decode_qsc(bytes),
             [cmd, _, _, _] => panic!("invalid command {cmd}"),
         }
     }
 }
 
-fn decode_move(bytes: &[u8; 4]) -> Move {
+fn decode_move(bytes: [u8; 4]) -> Move {
     let from = bytes[1];
     let to = bytes[2];
 
     Move::Piece(from.into(), to.into())
 }
 
-fn decode_promotion(bytes: &[u8; 4]) -> Move {
+fn decode_promotion(bytes: [u8; 4]) -> Move {
     let from = bytes[1];
     let to = bytes[2];
     let piece = bytes[3];
@@ -219,10 +222,10 @@ fn decode_promotion(bytes: &[u8; 4]) -> Move {
     Move::Promotion(from.into(), to.into(), piece.into())
 }
 
-fn decode_ksc(bytes: &[u8; 4]) -> Move {
+fn decode_ksc(bytes: [u8; 4]) -> Move {
     Move::KingSideCastle(bytes[1].into())
 }
 
-fn decode_qsc(bytes: &[u8; 4]) -> Move {
+fn decode_qsc(bytes: [u8; 4]) -> Move {
     Move::QueenSideCastle(bytes[1].into())
 }

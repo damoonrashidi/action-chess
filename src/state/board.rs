@@ -1,5 +1,3 @@
-use hecs::Bundle;
-
 use super::{
     cooldowns::*,
     coordinate::Coord,
@@ -8,7 +6,7 @@ use super::{
 use core::fmt;
 use std::fmt::Debug;
 
-#[derive(Debug, Clone, Default, Bundle)]
+#[derive(Debug, Clone, Default)]
 pub struct Board {
     pub pieces: [[Option<Piece>; 8]; 8],
 

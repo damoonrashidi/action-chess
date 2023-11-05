@@ -30,14 +30,14 @@ mod moves {
     #[test]
     fn all_black_starting_moves() {
         let mut board = Board::new().filter_by_color(Black);
-        for y in 0..8 {
-            for x in 0..8 {
+        (0..8).for_each(|y| {
+            (0..8).for_each(|x| {
                 if let Some(mut piece) = board.pieces[x][y] {
                     piece.set_cooldown(Duration::ZERO);
                     board.pieces[x][y] = Some(piece);
                 }
-            }
-        }
+            });
+        });
         let moves = MoveGen::new(&board).get_possible_moves();
         assert_eq!(moves.len(), 20);
     }
@@ -45,14 +45,14 @@ mod moves {
     #[test]
     fn all_black_starting_moves_with_capture() {
         let mut board = Board::new().filter_by_color(Black);
-        for y in 0..8 {
-            for x in 0..8 {
+        (0..8).for_each(|y| {
+            (0..8).for_each(|x| {
                 if let Some(mut piece) = board.pieces[x][y] {
                     piece.set_cooldown(Duration::ZERO);
                     board.pieces[x][y] = Some(piece);
                 }
-            }
-        }
+            });
+        });
         board.set_piece_at(Some(Piece::Pawn(White, Duration::ZERO)), D6);
         let moves = MoveGen::new(&board).get_possible_moves();
 
