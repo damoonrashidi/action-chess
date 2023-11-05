@@ -27,28 +27,36 @@ mod get_piece_information {
 #[cfg(test)]
 mod moves {
 
-    use crate::{
-        network::command::Command,
-        state::{
-            cooldowns::*,
-            piece::{Color, Move, Piece},
-            square::*,
-        },
+    use crate::state::{
+        cooldowns::*,
+        piece::{Color, Move, Piece},
+        square::*,
     };
 
     #[test]
     fn move_piece() {
-        let mv: Move = Command([0, 0, 0, 0]).into();
-        assert!(matches!(mv, Move::Piece(_, _)));
+        let mv: Move = [0, 0, 5, 0].into();
+        assert_eq!(mv, Move::Piece(A1, F1));
     }
 
     #[test]
     fn get_promote() {
-        let mv: Move = Command([1, 8, 0, 0b0001_0001]).into();
-        println!("{mv}");
-        assert!(matches!(
+        let mv: Move = [1, 8, 0, 0b0001_0001].into();
+        assert_eq!(
             mv,
             Move::Promotion(A2, A1, Piece::Knight(Color::Black, COOLDOWN_BISHOP))
-        ));
+        );
+    }
+
+    #[test]
+    fn castle_king_side() {
+        let mv: Move = [2, 0, 0, 0].into();
+        assert_eq!(mv, Move::KingSideCastle(Color::White));
+    }
+
+    #[test]
+    fn castle_queen_side() {
+        let mv: Move = [3, 1, 0, 0].into();
+        assert_eq!(mv, Move::QueenSideCastle(Color::Black));
     }
 }

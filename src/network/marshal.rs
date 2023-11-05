@@ -52,22 +52,22 @@ impl From<Coord> for u8 {
 impl From<Move> for Command {
     fn from(value: Move) -> Self {
         match value {
-            Move::Piece(from, to) => Command([MOVE_PIECE, from.into(), to.into(), BUFFER_BYTE]),
+            Move::Piece(from, to) => [MOVE_PIECE, from.into(), to.into(), BUFFER_BYTE],
             Move::Promotion(from, to, piece) => {
-                Command([MOVE_PROMOTION, from.into(), to.into(), piece.into()])
+                [MOVE_PROMOTION, from.into(), to.into(), piece.into()]
             }
-            Move::KingSideCastle(color) => Command([
+            Move::KingSideCastle(color) => [
                 MOVE_KING_SIDE_CASTLE,
                 color.into(),
                 BUFFER_BYTE,
                 BUFFER_BYTE,
-            ]),
-            Move::QueenSideCastle(color) => Command([
+            ],
+            Move::QueenSideCastle(color) => [
                 MOVE_QUEEN_SIDE_CASTLE,
                 color.into(),
                 BUFFER_BYTE,
                 BUFFER_BYTE,
-            ]),
+            ],
         }
     }
 }

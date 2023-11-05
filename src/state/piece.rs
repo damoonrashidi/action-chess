@@ -125,8 +125,10 @@ pub enum Move {
 impl Display for Move {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mv = match self {
-            Move::KingSideCastle(_) => "o-o".into(),
-            Move::QueenSideCastle(_) => "o-o-o".into(),
+            Move::KingSideCastle(Color::White) => "o-o".into(),
+            Move::QueenSideCastle(Color::White) => "o-o-o".into(),
+            Move::KingSideCastle(Color::Black) => "O-O".into(),
+            Move::QueenSideCastle(Color::Black) => "O-O-O".into(),
             Move::Piece(from, to) => format!("{from} -> {to}"),
             Move::Promotion(from, to, piece) => format!("{from} -> {to}={piece}"),
         };

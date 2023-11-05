@@ -22,7 +22,7 @@ fn main() -> std::io::Result<()> {
     .collect::<Vec<Command>>();
 
     for cmd in commands {
-        stream.write_all(&cmd.0)?;
+        stream.write_all(&cmd)?;
     }
 
     Ok(())

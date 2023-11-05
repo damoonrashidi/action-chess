@@ -61,7 +61,7 @@ impl From<u8> for Piece {
 
 impl From<Command> for Move {
     fn from(value: Command) -> Self {
-        let bytes = value.0;
+        let bytes = value;
 
         match bytes {
             [MOVE_PIECE, _, _, _] => decode_move(bytes),

@@ -3,12 +3,12 @@ use std::{
     net::{TcpListener, TcpStream},
 };
 
-use action_chess::{network::command::Command, state::piece::Move};
+use action_chess::state::piece::Move;
 
 fn handle_client(mut stream: TcpStream) -> std::io::Result<()> {
-    let mut command = Command([0; 4]);
+    let mut command = [0; 4];
     for _ in 0..4 {
-        match stream.read(&mut command.0) {
+        match stream.read(&mut command) {
             Ok(_) => {
                 let mv: Move = command.into();
                 println!("message {mv}");

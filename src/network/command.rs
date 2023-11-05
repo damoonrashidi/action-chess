@@ -62,5 +62,4 @@ The third byte is an EMPTY buffer byte.
 The fourth byte is an EMPTY buffer byte.
 
 */
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub struct Command(pub [u8; 4]);
+pub type Command = [u8; 4];

@@ -30,7 +30,7 @@ mod test {
     fn serialize_move() {
         let mv = Move::Piece(A5, C5);
         let command: Command = mv.into();
-        assert_eq!(command, Command([0, 32, 34, 0]));
+        assert_eq!(command, [0, 32, 34, 0]);
     }
 
     #[test]
@@ -38,7 +38,7 @@ mod test {
         let mv = Move::Promotion(D7, D8, Piece::Rook(Color::White, COOLDOWN_ROOK));
         let command: Command = mv.into();
 
-        assert_eq!(command, Command([1, 51, 59, 48]));
+        assert_eq!(command, [1, 51, 59, 48]);
     }
 
     #[test]
@@ -46,7 +46,7 @@ mod test {
         let mv = Move::Promotion(A2, A1, Piece::Queen(Color::Black, COOLDOWN_QUEEN));
         let command: Command = mv.into();
 
-        assert_eq!(command, Command([1, 8, 0, 65]));
+        assert_eq!(command, [1, 8, 0, 65]);
     }
 
     #[test]
@@ -54,7 +54,7 @@ mod test {
         let mv = Move::KingSideCastle(Color::Black);
         let command: Command = mv.into();
 
-        assert_eq!(command, Command([2, 1, 0, 0]));
+        assert_eq!(command, [2, 1, 0, 0]);
     }
 
     #[test]
@@ -62,6 +62,6 @@ mod test {
         let mv = Move::QueenSideCastle(Color::White);
         let command: Command = mv.into();
 
-        assert_eq!(command, Command([3, 0, 0, 0]));
+        assert_eq!(command, [3, 0, 0, 0]);
     }
 }
