@@ -35,7 +35,7 @@ mod moves {
 
     #[test]
     fn move_piece() {
-        let mv: Move = [0, 0, 5, 0].into();
+        let mv: Move = [0u8, 0, 5, 0].into();
         assert_eq!(mv, Move::Piece(A1, F1));
     }
 
@@ -50,13 +50,13 @@ mod moves {
 
     #[test]
     fn castle_king_side() {
-        let mv: Move = [2, 0, 0, 0].into();
+        let mv: Move = [2u8, 0, 0, 0].into();
         assert_eq!(mv, Move::KingSideCastle(Color::White));
     }
 
     #[test]
     fn castle_queen_side() {
-        let mv: Move = [3, 1, 0, 0].into();
+        let mv: Move = [3u8, 1, 0, 0].into();
         assert_eq!(mv, Move::QueenSideCastle(Color::Black));
     }
 }

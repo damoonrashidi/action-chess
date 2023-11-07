@@ -13,6 +13,11 @@ use crate::{
     },
 };
 
+use super::{
+    constants::{GAME_JOIN, GAME_LEAVE, GAME_RESIGN},
+    game_command::GameCmd,
+};
+
 impl From<Piece> for u8 {
     fn from(value: Piece) -> Self {
         let color = match value.get_color() {
@@ -68,6 +73,17 @@ impl From<Move> for Command {
                 BUFFER_BYTE,
                 BUFFER_BYTE,
             ],
+        }
+    }
+}
+
+impl From<GameCmd> for Command {
+    fn from(value: GameCmd) -> Self {
+        match value {
+            #[allow(clippy::cast_possible_truncation)]
+            GameCmd::Join(game_id) => [GAME_JOIN, (game_id >> 8) as u8, (game_id & 0xFF) as u8, 0],
+            GameCmd::Leave => [GAME_LEAVE, 0, 0, 0],
+            GameCmd::Resign => [GAME_RESIGN, 0, 0, 0],
         }
     }
 }

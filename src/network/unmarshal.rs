@@ -16,6 +16,11 @@ use crate::{
     },
 };
 
+use super::{
+    constants::{GAME_JOIN, GAME_LEAVE, GAME_RESIGN},
+    game_command::GameCmd,
+};
+
 impl From<u8> for Color {
     fn from(value: u8) -> Self {
         if value & COLOR_BLACK == COLOR_BLACK {
@@ -61,26 +66,36 @@ impl From<u8> for Piece {
 
 impl From<Command> for Move {
     fn from(value: Command) -> Self {
-        let bytes = value;
-
-        match bytes {
-            [MOVE_PIECE, _, _, _] => decode_move(bytes),
-            [MOVE_PROMOTION, _, _, _] => decode_promotion(bytes),
-            [MOVE_KING_SIDE_CASTLE, _, _, _] => decode_ksc(bytes),
-            [MOVE_QUEEN_SIDE_CASTLE, _, _, _] => decode_qsc(bytes),
-            [cmd, _, _, _] => panic!("invalid command {cmd}"),
+        match value {
+            [MOVE_PIECE, ..] => decode_move(&value),
+            [MOVE_PROMOTION, ..] => decode_promotion(&value),
+            [MOVE_KING_SIDE_CASTLE, ..] => decode_ksc(&value),
+            [MOVE_QUEEN_SIDE_CASTLE, ..] => decode_qsc(&value),
+            [cmd, ..] => panic!("invalid lead byte {cmd}"),
         }
     }
 }
 
-fn decode_move(bytes: [u8; 4]) -> Move {
+impl From<Command> for GameCmd {
+    fn from(value: Command) -> Self {
+        match value {
+            #[allow(clippy::cast_lossless)]
+            [GAME_JOIN, game_id, ..] => GameCmd::Join((game_id as u16) << 8 | game_id as u16),
+            [GAME_LEAVE, ..] => GameCmd::Leave,
+            [GAME_RESIGN, ..] => GameCmd::Resign,
+            [cmd, ..] => panic!("invalid lead byte {cmd}"),
+        }
+    }
+}
+
+fn decode_move(bytes: &[u8]) -> Move {
     let from = bytes[1];
     let to = bytes[2];
 
     Move::Piece(from.into(), to.into())
 }
 
-fn decode_promotion(bytes: [u8; 4]) -> Move {
+fn decode_promotion(bytes: &[u8]) -> Move {
     let from = bytes[1];
     let to = bytes[2];
     let piece = bytes[3];
@@ -88,10 +103,10 @@ fn decode_promotion(bytes: [u8; 4]) -> Move {
     Move::Promotion(from.into(), to.into(), piece.into())
 }
 
-fn decode_ksc(bytes: [u8; 4]) -> Move {
+fn decode_ksc(bytes: &[u8]) -> Move {
     Move::KingSideCastle(bytes[1].into())
 }
 
-fn decode_qsc(bytes: [u8; 4]) -> Move {
+fn decode_qsc(bytes: &[u8]) -> Move {
     Move::QueenSideCastle(bytes[1].into())
 }

@@ -8,6 +8,10 @@ The first byte indicatates what kind of move it is.
 1. Promotion
 2. King Side Castle
 3. Queen Side Castle
+--
+16. Join
+32. Leave
+48. Resign
 
 ### In the case of (0) Piece.
 The second byte is the "from" `Coord` in the format u8 0..64 translated to (file, rank)
