@@ -393,6 +393,7 @@ impl<'board> MoveGen<'board> {
         .collect()
     }
 
+    #[allow(unused)]
     pub fn render_movelist(board: &Board, moves: &[Move]) {
         let mut render = String::from("    A | B | C | D | E | F | G | H \n");
         render = format!("{render}  |---+---+---+---+---+---+---+---|\n");

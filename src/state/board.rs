@@ -1,10 +1,11 @@
 use super::{
     cooldowns::*,
     coordinate::Coord,
+    movegen::MoveGen,
     piece::{Color, Move, Piece},
 };
 use core::fmt;
-use std::fmt::Debug;
+use std::{fmt::Debug, time::Duration};
 
 #[derive(Debug, Clone, Default)]
 pub struct Board {
@@ -261,7 +262,31 @@ impl Board {
         None
     }
 
+    pub fn tick(&mut self) {
+        for y in 0..8 {
+            for x in 0..8 {
+                if let Some(mut piece) = self.pieces[y][x] {
+                    let cd = piece.get_cooldown();
+                    let new_cd = if let Some(new_cd) = cd.checked_sub(Duration::from_millis(16)) {
+                        new_cd
+                    } else {
+                        Duration::ZERO
+                    };
+                    piece.set_cooldown(new_cd);
+                }
+            }
+        }
+    }
+
     fn is_valid_move(&self, mv: Move) -> bool {
+        let gen = MoveGen::new(self);
+
+        let moves = gen.get_possible_moves();
+
+        if !moves.contains(&mv) {
+            return false;
+        }
+
         match mv {
             Move::KingSideCastle(color) => match color {
                 Color::White => self.white_can_castle_kingside,

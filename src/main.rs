@@ -1,6 +1,8 @@
+pub mod server;
+
 use std::time::Duration;
 
-use action_chess::state::{board::Board, movegen::MoveGen};
+use action_chess::state::board::Board;
 
 fn main() {
     let mut board = Board::from_fen("qrb5/rk1p1K2/p2P4/Pp6/1N2n3/6p1/5nB1/6b1 w - - 0 1").unwrap();
@@ -12,6 +14,5 @@ fn main() {
             }
         }
     }
-    let moves = MoveGen::new(&board).get_possible_moves();
-    MoveGen::render_movelist(&board, &moves);
+    println!("{board}");
 }

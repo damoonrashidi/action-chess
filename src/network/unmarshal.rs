@@ -79,8 +79,7 @@ impl From<Command> for Move {
 impl From<Command> for GameCmd {
     fn from(value: Command) -> Self {
         match value {
-            #[allow(clippy::cast_lossless)]
-            [GAME_JOIN, game_id, ..] => GameCmd::Join((game_id as u16) << 8 | game_id as u16),
+            [GAME_JOIN, p1, p2, p3] => GameCmd::Join(String::from_utf8(vec![p1, p2, p3]).unwrap()),
             [GAME_LEAVE, ..] => GameCmd::Leave,
             [GAME_RESIGN, ..] => GameCmd::Resign,
             [cmd, ..] => panic!("invalid lead byte {cmd}"),
