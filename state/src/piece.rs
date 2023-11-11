@@ -1,4 +1,4 @@
-use crate::state::coordinate::Coord;
+use crate::coordinate::Coord;
 use std::{fmt::Display, time::Duration};
 
 use super::cooldowns::{

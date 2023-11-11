@@ -1,10 +1,13 @@
 #[cfg(test)]
 mod tests {
-    use crate::state::{
+    use crate::{
         board::Board,
-        cooldowns::*,
-        piece::{Color::*, Piece},
-        square::*,
+        cooldowns::{COOLDOWN_KING, COOLDOWN_PAWN, COOLDOWN_QUEEN, COOLDOWN_ROOK},
+        piece::{
+            Color::{Black, White},
+            Piece,
+        },
+        square,
     };
 
     #[test]
@@ -48,19 +51,19 @@ mod tests {
         let board =
             Board::from_fen("r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 w qQ - 0 0").unwrap();
         assert_eq!(
-            board.get_piece_at(&A8),
+            board.get_piece_at(&square::A8),
             &Some(Piece::Rook(Black, COOLDOWN_ROOK))
         );
         assert_eq!(
-            board.get_piece_at(&H8),
+            board.get_piece_at(&square::A8),
             &Some(Piece::Rook(Black, COOLDOWN_ROOK))
         );
         assert_eq!(
-            board.get_piece_at(&A1),
+            board.get_piece_at(&square::A1),
             &Some(Piece::Queen(Black, COOLDOWN_QUEEN))
         );
         assert_eq!(
-            board.get_piece_at(&E2),
+            board.get_piece_at(&square::E2),
             &Some(Piece::King(White, COOLDOWN_KING))
         );
         assert!(!board.white_can_castle_kingside);

@@ -1,19 +1,17 @@
 use crate::{
-    network::{
-        command::Command,
-        constants::{
-            COLOR_BLACK, MOVE_KING_SIDE_CASTLE, MOVE_PIECE, MOVE_PROMOTION, MOVE_QUEEN_SIDE_CASTLE,
-            PIECE_BISHOP, PIECE_KING, PIECE_KNIGHT, PIECE_PAWN, PIECE_QUEEN, PIECE_ROOK,
-        },
+    command::Command,
+    constants::{
+        COLOR_BLACK, MOVE_KING_SIDE_CASTLE, MOVE_PIECE, MOVE_PROMOTION, MOVE_QUEEN_SIDE_CASTLE,
+        PIECE_BISHOP, PIECE_KING, PIECE_KNIGHT, PIECE_PAWN, PIECE_QUEEN, PIECE_ROOK,
     },
-    state::{
-        cooldowns::{
-            COOLDOWN_BISHOP, COOLDOWN_KING, COOLDOWN_KNIGHT, COOLDOWN_PAWN, COOLDOWN_QUEEN,
-            COOLDOWN_ROOK,
-        },
-        coordinate::Coord,
-        piece::{Color, Move, Piece},
+};
+use state::{
+    cooldowns::{
+        COOLDOWN_BISHOP, COOLDOWN_KING, COOLDOWN_KNIGHT, COOLDOWN_PAWN, COOLDOWN_QUEEN,
+        COOLDOWN_ROOK,
     },
+    coordinate::Coord,
+    piece::{Color, Move, Piece},
 };
 
 use super::{

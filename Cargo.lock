@@ -73,6 +73,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "da2479e8c062e40bf0066ffa0bc823de0a9368974af99c9f6df941d2c231e03f"
 
 [[package]]
+name = "network"
+version = "0.1.0"
+dependencies = [
+ "state",
+]
+
+[[package]]
 name = "num_cpus"
 version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -93,6 +100,22 @@ dependencies = [
  "libc",
  "linux-raw-sys",
  "windows-sys",
+]
+
+[[package]]
+name = "server"
+version = "0.1.0"
+dependencies = [
+ "network",
+ "state",
+]
+
+[[package]]
+name = "state"
+version = "0.1.0"
+dependencies = [
+ "colored",
+ "threadpool",
 ]
 
 [[package]]

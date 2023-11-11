@@ -1,9 +1,8 @@
+use action_chess::state::board::Board;
 use std::{
     collections::{hash_set::Iter, HashSet},
     net::SocketAddr,
 };
-
-use action_chess::state::board::Board;
 
 pub struct Game {
     players: HashSet<SocketAddr>,

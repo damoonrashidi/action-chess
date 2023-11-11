@@ -11,7 +11,7 @@ use super::{
     coordinate::Coord,
     piece::{Move, Piece},
 };
-use crate::state::piece::Color;
+use crate::piece::Color;
 use colored::Colorize;
 
 pub struct MoveGen<'board> {

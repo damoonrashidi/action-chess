@@ -2,7 +2,7 @@
 mod moves {
     use std::time::Duration;
 
-    use crate::state::{
+    use crate::{
         board::Board,
         movegen::MoveGen,
         piece::{
@@ -73,7 +73,7 @@ mod moves {
 mod bishop_moves {
     use std::time::Duration;
 
-    use crate::state::{
+    use crate::{
         board::Board,
         coordinate::Coord,
         movegen::MoveGen,
@@ -115,7 +115,7 @@ mod bishop_moves {
 mod knight_moves {
     use std::time::Duration;
 
-    use crate::state::{
+    use crate::{
         board::Board,
         coordinate::Coord,
         movegen::MoveGen,
@@ -154,7 +154,7 @@ mod knight_moves {
 
 #[cfg(test)]
 mod king_moves {
-    use crate::state::{
+    use crate::{
         board::Board,
         coordinate::Coord,
         movegen::MoveGen,
@@ -235,7 +235,7 @@ mod king_moves {
 mod pawn_moves {
     use std::time::Duration;
 
-    use crate::state::{
+    use crate::{
         board::Board,
         coordinate::Coord,
         movegen::MoveGen,
@@ -325,7 +325,7 @@ mod pawn_moves {
 mod castling {
     use std::time::Duration;
 
-    use crate::state::{
+    use crate::{
         board::Board,
         movegen::MoveGen,
         piece::{Color::White, Move, Piece},
@@ -377,7 +377,7 @@ mod castling {
 mod rook_moves {
     use std::time::Duration;
 
-    use crate::state::{
+    use crate::{
         board::Board,
         coordinate::Coord,
         movegen::MoveGen,

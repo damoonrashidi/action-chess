@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod get_piece_information {
-    use crate::state::piece::{Color, Piece};
+    use state::piece::{Color, Piece};
 
     #[test]
     fn get_color_for_piece() {
@@ -27,7 +27,7 @@ mod get_piece_information {
 #[cfg(test)]
 mod moves {
 
-    use crate::state::{
+    use state::{
         cooldowns::*,
         piece::{Color, Move, Piece},
         square::*,

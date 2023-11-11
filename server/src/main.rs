@@ -5,7 +5,7 @@ use std::{
     thread,
 };
 
-use action_chess::{helpers::world::World, network::game_command::GameCmd, state::piece::Move};
+use crate::{network::game_command::GameCmd, server::world::World, state::piece::Move};
 
 fn main() -> Result<()> {
     let socket = UdpSocket::bind("127.0.0.1:8080")?;

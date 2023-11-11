@@ -1,13 +1,11 @@
 #[cfg(test)]
 mod test {
-    use crate::{
-        network::command::Command,
-        state::{
-            cooldowns::{COOLDOWN_QUEEN, COOLDOWN_ROOK},
-            coordinate::Coord,
-            piece::{Color, Move, Piece},
-            square::*,
-        },
+    use crate::command::Command;
+    use state::{
+        cooldowns::{COOLDOWN_QUEEN, COOLDOWN_ROOK},
+        coordinate::Coord,
+        piece::{Color, Move, Piece},
+        square::*,
     };
 
     #[test]
