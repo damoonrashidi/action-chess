@@ -10,7 +10,12 @@ threadpool = "1.8.1"
 [workspace]
 
 members = [
-    "state",
-    "network",
-    "server"
+    "src/state",
+    "src/network",
+    "src/bin/server"
 ]
+
+[[bin]]
+name = "server"
+test = false
+bench = false
