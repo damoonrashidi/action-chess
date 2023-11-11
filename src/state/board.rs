@@ -1,5 +1,8 @@
 use super::{
-    cooldowns::*,
+    cooldowns::{
+        COOLDOWN_BISHOP, COOLDOWN_KING, COOLDOWN_KNIGHT, COOLDOWN_PAWN, COOLDOWN_QUEEN,
+        COOLDOWN_ROOK,
+    },
     coordinate::Coord,
     movegen::MoveGen,
     piece::{Color, Move, Piece},
@@ -8,6 +11,7 @@ use core::fmt;
 use std::{fmt::Debug, time::Duration};
 
 #[derive(Debug, Clone, Default)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct Board {
     pub pieces: [[Option<Piece>; 8]; 8],
 
@@ -18,6 +22,7 @@ pub struct Board {
 }
 
 impl Board {
+    #[must_use]
     pub fn new() -> Self {
         let mut pieces: [[Option<Piece>; 8]; 8] = [[None; 8]; 8];
 
@@ -55,6 +60,7 @@ impl Board {
         }
     }
 
+    #[must_use]
     pub fn from_fen(fen: &str) -> Option<Self> {
         let parts = fen.split_whitespace().collect::<Vec<&str>>();
         let positions = parts.first()?;
@@ -125,6 +131,7 @@ impl Board {
         })
     }
 
+    #[must_use]
     pub fn get_piece_count(&self) -> usize {
         self.pieces
             .into_iter()
@@ -132,6 +139,7 @@ impl Board {
             .sum()
     }
 
+    #[must_use]
     pub fn get_piece_at(&self, position: &Coord) -> &Option<Piece> {
         if !position.is_valid() {
             return &None;
@@ -140,7 +148,7 @@ impl Board {
     }
 
     pub fn set_piece_at(&mut self, piece: Option<Piece>, position: Coord) {
-        self.pieces[position.1 as usize][position.0 as usize] = piece
+        self.pieces[position.1 as usize][position.0 as usize] = piece;
     }
 
     pub fn remove_by_piece(&mut self, piece: &Piece) {
@@ -155,6 +163,7 @@ impl Board {
         }
     }
 
+    #[must_use]
     pub fn filter_by_piece(&self, piece: Piece) -> Board {
         let mut pieces = [[None; 8]; 8];
         (0..8).for_each(|y| {
@@ -178,6 +187,7 @@ impl Board {
         }
     }
 
+    #[must_use]
     pub fn filter_by_color(&self, color: Color) -> Board {
         let mut pieces = [[None; 8]; 8];
 
@@ -247,6 +257,7 @@ impl Board {
         self
     }
 
+    #[must_use]
     pub fn get_coord_for_piece(&self, piece: &Piece) -> Option<Coord> {
         for y in 0..8 {
             for x in 0..8 {
@@ -304,7 +315,7 @@ impl Board {
 
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut board = String::from("");
+        let mut board = String::new();
 
         for y in (0..8).rev() {
             board = format!("{board}{} ", y + 1);

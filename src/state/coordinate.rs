@@ -4,6 +4,7 @@ use std::fmt::Display;
 pub struct Coord(pub i8, pub i8);
 
 impl Coord {
+    #[must_use]
     pub fn is_valid(&self) -> bool {
         (0..8).contains(&self.0) && (0..8).contains(&self.1)
     }

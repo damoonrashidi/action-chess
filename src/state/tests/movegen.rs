@@ -64,7 +64,7 @@ mod moves {
         let mut board = Board::default();
         board.set_piece_at(Some(Piece::Rook(Black, Duration::ZERO)), F3);
         let moves =
-            MoveGen::new(&board).for_rook(&Piece::Rook(White, Duration::from_millis(50)), &A3);
+            MoveGen::new(&board).for_rook(&Piece::Rook(White, Duration::from_millis(50)), A3);
         assert!(moves.is_empty());
     }
 }
@@ -84,7 +84,7 @@ mod bishop_moves {
     #[test]
     fn bishop_on_empty() {
         let board = Board::default();
-        let moves = MoveGen::new(&board).for_bishop(&Piece::Bishop(White, Duration::ZERO), &E5);
+        let moves = MoveGen::new(&board).for_bishop(&Piece::Bishop(White, Duration::ZERO), E5);
         let expected_moves = vec![D4, C3, B2, A1, F6, G7, H8, F4, G3, H2, D6, C7, B8];
 
         assert!(move_lists_has_all_targets(E5, &expected_moves, &moves));
@@ -93,7 +93,7 @@ mod bishop_moves {
     #[test]
     fn bishop_on_standard() {
         let board = Board::new();
-        let moves = MoveGen::new(&board).for_bishop(&Piece::Bishop(White, Duration::ZERO), &E5);
+        let moves = MoveGen::new(&board).for_bishop(&Piece::Bishop(White, Duration::ZERO), E5);
         let expected_moves = vec![D4, C3, F6, G7, F4, G3, D6, C7];
 
         assert!(move_lists_has_all_targets(E5, &expected_moves, &moves));
@@ -126,7 +126,7 @@ mod knight_moves {
     #[test]
     fn knight_in_starting_position() {
         let board = Board::new();
-        let moves = MoveGen::new(&board).for_knight(&Piece::Knight(White, Duration::ZERO), &G1);
+        let moves = MoveGen::new(&board).for_knight(&Piece::Knight(White, Duration::ZERO), G1);
         let expected_moves = vec![H3, F3];
 
         assert!(move_lists_has_all_targets(G1, &expected_moves, &moves));
@@ -135,7 +135,7 @@ mod knight_moves {
     #[test]
     fn knight_on_standard_board() {
         let board = Board::new();
-        let moves = MoveGen::new(&board).for_knight(&Piece::Knight(White, Duration::ZERO), &E4);
+        let moves = MoveGen::new(&board).for_knight(&Piece::Knight(White, Duration::ZERO), E4);
 
         assert_eq!(moves.len(), 6);
     }
@@ -178,7 +178,7 @@ mod king_moves {
                 }
             }
         }
-        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), &E5);
+        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), E5);
         let expected_moves = vec![D5, F5, D4, E4, F4];
 
         assert!(move_lists_has_all_targets(E5, &expected_moves, &moves));
@@ -188,7 +188,7 @@ mod king_moves {
     #[test]
     fn king_on_empty_board() {
         let board = Board::default();
-        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), &E5);
+        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), E5);
 
         assert_eq!(moves.len(), 8);
 
@@ -203,7 +203,7 @@ mod king_moves {
     fn king_cant_move_into_check() {
         let mut board = Board::default();
         board.set_piece_at(Some(Piece::Rook(Black, Duration::ZERO)), A1);
-        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), &B2);
+        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), B2);
 
         assert!(move_lists_has_all_targets(B2, &[A1, B3, C2, C3], &moves));
         assert_eq!(moves.len(), 4);
@@ -213,7 +213,7 @@ mod king_moves {
     fn king_cant_move_into_opposing_king() {
         let mut board = Board::default();
         board.set_piece_at(Some(Piece::King(Black, Duration::ZERO)), D5);
-        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), &D3);
+        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), D3);
         let expected_moves = vec![C3, E3, C2, D2, E2];
         assert_eq!(moves.len(), expected_moves.len());
         assert!(move_lists_has_all_targets(D3, &expected_moves, &moves));
@@ -257,7 +257,7 @@ mod pawn_moves {
                 }
             }
         }
-        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(White, Duration::ZERO), &B6);
+        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(White, Duration::ZERO), B6);
         assert_eq!(moves.len(), 0);
     }
 
@@ -267,7 +267,7 @@ mod pawn_moves {
         board.set_piece_at(Some(Piece::Pawn(Black, Duration::ZERO)), D3);
         board.set_piece_at(Some(Piece::Bishop(White, Duration::ZERO)), C3);
         board.set_piece_at(Some(Piece::Rook(White, Duration::ZERO)), E3);
-        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(Black, Duration::ZERO), &D4);
+        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(Black, Duration::ZERO), D4);
         let expected_moves = vec![C3, E3];
 
         assert!(move_lists_has_all_targets(D4, &expected_moves, &moves));
@@ -276,7 +276,7 @@ mod pawn_moves {
     #[test]
     fn white_pawn_at_start() {
         let board = Board::new();
-        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(White, Duration::ZERO), &A2);
+        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(White, Duration::ZERO), A2);
         let expected_moves = vec![A3, A4];
 
         assert!(move_lists_has_all_targets(A2, &expected_moves, &moves));
@@ -286,7 +286,7 @@ mod pawn_moves {
     fn black_pawn_at_start_with_capture() {
         let mut board = Board::default();
         board.set_piece_at(Some(Piece::Bishop(White, Duration::ZERO)), A6);
-        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(Black, Duration::ZERO), &B7);
+        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(Black, Duration::ZERO), B7);
         let expected_moves = vec![A6, B6, B5];
 
         assert!(move_lists_has_all_targets(B7, &expected_moves, &moves));
@@ -296,7 +296,7 @@ mod pawn_moves {
     fn black_pawn_at_start() {
         let mut board = Board::default();
         board.set_piece_at(Some(Piece::Bishop(White, Duration::ZERO)), D5);
-        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(Black, Duration::ZERO), &D7);
+        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(Black, Duration::ZERO), D7);
         let expected_moves = vec![D6];
 
         assert!(move_lists_has_all_targets(D7, &expected_moves, &moves));
@@ -305,7 +305,7 @@ mod pawn_moves {
     #[test]
     fn promote_white_pawn() {
         let board = Board::default();
-        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(Black, Duration::ZERO), &B2);
+        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(Black, Duration::ZERO), B2);
         assert_eq!(moves.len(), 4);
     }
 
@@ -337,7 +337,7 @@ mod castling {
         let mut board = Board::default();
         board.set_piece_at(Some(Piece::Rook(White, Duration::ZERO)), H1);
         board.white_can_castle_kingside = true;
-        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), &E1);
+        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), E1);
         assert!(moves.contains(&Move::KingSideCastle(White)));
     }
 
@@ -349,7 +349,7 @@ mod castling {
         board.set_piece_at(Some(Piece::Rook(White, Duration::ZERO)), H1);
         board.white_can_castle_kingside = true;
         board.white_can_castle_queenside = true;
-        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), &E1);
+        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), E1);
         assert!(moves.contains(&Move::KingSideCastle(White)));
         assert!(!moves.contains(&Move::QueenSideCastle(White)));
     }
@@ -359,7 +359,7 @@ mod castling {
         let mut board = Board::default();
         board.set_piece_at(Some(Piece::Rook(White, Duration::ZERO)), H1);
         board.white_can_castle_kingside = true;
-        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), &E2);
+        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), E2);
         assert!(!moves.contains(&Move::KingSideCastle(White)));
     }
 
@@ -368,7 +368,7 @@ mod castling {
         let mut board = Board::default();
         board.set_piece_at(Some(Piece::Rook(White, Duration::ZERO)), A1);
         board.white_can_castle_queenside = true;
-        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), &E1);
+        let moves = MoveGen::new(&board).for_king(&Piece::King(White, Duration::ZERO), E1);
         assert!(moves.contains(&Move::QueenSideCastle(White)));
     }
 }
@@ -391,7 +391,7 @@ mod rook_moves {
     #[test]
     fn rook_on_empty_board() {
         let board = Board::default();
-        let moves = MoveGen::new(&board).for_rook(&Piece::Rook(White, Duration::ZERO), &E4);
+        let moves = MoveGen::new(&board).for_rook(&Piece::Rook(White, Duration::ZERO), E4);
 
         assert_eq!(moves.len(), 14);
     }
@@ -399,7 +399,7 @@ mod rook_moves {
     #[test]
     fn rook_on_standard_board() {
         let board = Board::new();
-        let moves = MoveGen::new(&board).for_rook(&Piece::Rook(White, Duration::ZERO), &A5);
+        let moves = MoveGen::new(&board).for_rook(&Piece::Rook(White, Duration::ZERO), A5);
         let expected_moves = vec![A6, A7, B5, C5, D5, E5, F5, G5, H5, A4, A3];
 
         assert!(move_lists_has_all_targets(A5, &expected_moves, &moves));
@@ -408,7 +408,7 @@ mod rook_moves {
     #[test]
     fn starting_rook() {
         let board = Board::new();
-        let moves = MoveGen::new(&board).for_rook(&Piece::Rook(White, Duration::ZERO), &A1);
+        let moves = MoveGen::new(&board).for_rook(&Piece::Rook(White, Duration::ZERO), A1);
 
         assert_eq!(moves.len(), 0);
     }
@@ -416,7 +416,7 @@ mod rook_moves {
     #[test]
     fn infiltrated_starting_rook() {
         let board = Board::new();
-        let moves = MoveGen::new(&board).for_rook(&Piece::Rook(Black, Duration::ZERO), &A1);
+        let moves = MoveGen::new(&board).for_rook(&Piece::Rook(Black, Duration::ZERO), A1);
 
         assert_eq!(vec![Move::Piece(A1, A2), Move::Piece(A1, B1)], moves);
     }
@@ -432,7 +432,7 @@ mod rook_moves {
                 }
             }
         }
-        let moves = MoveGen::new(&board).for_rook(&Piece::Rook(White, Duration::ZERO), &B6);
+        let moves = MoveGen::new(&board).for_rook(&Piece::Rook(White, Duration::ZERO), B6);
         assert_eq!(moves.len(), 6);
     }
 

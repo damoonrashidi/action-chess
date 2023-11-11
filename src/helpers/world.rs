@@ -9,6 +9,7 @@ pub struct World {
 }
 
 impl World {
+    #[must_use]
     pub fn new() -> Self {
         Self {
             games: HashMap::new(),
@@ -27,8 +28,8 @@ impl World {
         Some(game)
     }
 
-    pub fn add_player(&mut self, player: SocketAddr, game_id: String) -> Option<()> {
-        let game = self.games.get_mut(&game_id)?;
+    pub fn add_player(&mut self, player: SocketAddr, game_id: &String) -> Option<()> {
+        let game = self.games.get_mut(game_id)?;
         game.add_player(player);
 
         None

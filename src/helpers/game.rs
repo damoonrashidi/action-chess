@@ -16,6 +16,7 @@ impl Game {
         self.players.insert(player);
     }
 
+    #[must_use]
     pub fn get_players(&self) -> Iter<'_, SocketAddr> {
         self.players.iter()
     }

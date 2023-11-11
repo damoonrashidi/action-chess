@@ -1,7 +1,9 @@
 use crate::state::coordinate::Coord;
 use std::{fmt::Display, time::Duration};
 
-use super::cooldowns::*;
+use super::cooldowns::{
+    COOLDOWN_BISHOP, COOLDOWN_KING, COOLDOWN_KNIGHT, COOLDOWN_PAWN, COOLDOWN_QUEEN, COOLDOWN_ROOK,
+};
 
 #[derive(Clone, Copy, Debug)]
 pub enum Piece {
@@ -15,36 +17,43 @@ pub enum Piece {
 
 impl Piece {
     #[inline]
+    #[must_use]
     pub fn is_king(&self) -> bool {
         matches!(self, Self::King(_, _))
     }
 
     #[inline]
+    #[must_use]
     pub fn is_queen(&self) -> bool {
         matches!(self, Self::Queen(_, _))
     }
 
     #[inline]
+    #[must_use]
     pub fn is_rook(&self) -> bool {
         matches!(self, Self::Rook(_, _))
     }
 
     #[inline]
+    #[must_use]
     pub fn is_bishop(&self) -> bool {
         matches!(self, Self::Bishop(_, _))
     }
 
     #[inline]
+    #[must_use]
     pub fn is_knight(&self) -> bool {
         matches!(self, Self::Knight(_, _))
     }
 
+    #[must_use]
     #[inline]
     pub fn is_pawn(&self) -> bool {
         matches!(self, Self::Pawn(_, _))
     }
 
     #[inline]
+    #[must_use]
     pub fn get_color(&self) -> Color {
         match self {
             Piece::Pawn(color, _)
@@ -57,6 +66,7 @@ impl Piece {
     }
 
     #[inline]
+    #[must_use]
     pub fn opposing_color(&self) -> Color {
         match self.get_color() {
             Color::White => Color::Black,
@@ -65,6 +75,7 @@ impl Piece {
     }
 
     #[inline]
+    #[must_use]
     pub fn get_cooldown(&self) -> Duration {
         match self {
             Piece::Pawn(_, cd)
@@ -89,6 +100,7 @@ impl Piece {
     }
 
     #[inline]
+    #[must_use]
     pub fn std_piece_cooldown(piece: &Piece) -> Duration {
         match piece {
             Piece::Pawn(_, _) => COOLDOWN_PAWN,
