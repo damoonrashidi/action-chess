@@ -29,6 +29,9 @@ fn main() -> Result<()> {
                             let mut world = world.lock().unwrap();
                             if let Some(game) = world.get_game_mut(&game_id) {
                                 game.add_player(addr);
+                            } else {
+                                world.create_game(&game_id);
+                                world.add_player(addr, &game_id);
                             }
                         }
                         GameCmd::Leave => println!("{addr} is leaving their game"),

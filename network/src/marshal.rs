@@ -77,12 +77,9 @@ impl Marshal {
             ],
         }
     }
-}
 
-impl From<GameCmd> for Command {
-    fn from(value: GameCmd) -> Self {
+    pub fn game_command(value: GameCmd) -> Command {
         match value {
-            #[allow(clippy::cast_possible_truncation)]
             GameCmd::Join(game_id) => {
                 let game_id_bytes = game_id.as_bytes();
                 [

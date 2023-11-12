@@ -5,14 +5,21 @@ use std::{
 
 use state::board::Board;
 
+#[derive(Debug)]
 pub struct Game {
     players: HashSet<SocketAddr>,
     pub board: Board,
 }
 
 impl Game {
+    pub fn new() -> Self {
+        Self {
+            players: HashSet::new(),
+            board: Board::new(),
+        }
+    }
+
     pub fn add_player(&mut self, player: SocketAddr) {
-        println!("adding {player} to game");
         self.players.insert(player);
     }
 
