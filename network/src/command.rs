@@ -1,3 +1,5 @@
+use state::piece::Move;
+
 /**
 A command is 4 bytes represented by a `[u8; 4]`.
 This is all data needed to represent a move, and thus will be all that is sent over the wire during a game.

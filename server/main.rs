@@ -1,6 +1,5 @@
 mod world;
 
-use crate::world::World;
 use std::{
     io::Result,
     net::UdpSocket,
@@ -8,10 +7,14 @@ use std::{
     thread,
 };
 
+use network::game_command::GameCmd;
+use state::piece::Move;
+use world::world_state::WorldState;
+
 fn main() -> Result<()> {
     let socket = UdpSocket::bind("127.0.0.1:8080")?;
 
-    let world = Arc::new(Mutex::new(World::new()));
+    let world = Arc::new(Mutex::new(WorldState::new()));
 
     let thread = thread::spawn(move || -> Result<()> {
         loop {

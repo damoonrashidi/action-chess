@@ -1,0 +1,13 @@
+[package]
+name = "server"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+state = { path = "../state" }
+network = { path = "../network" }
+
+[[bin]]
+name = "server"
+path = "main.rs"

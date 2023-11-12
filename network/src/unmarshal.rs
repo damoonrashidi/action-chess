@@ -1,9 +1,8 @@
 use crate::{
     command::Command,
     constants::{
-        COLOR_BLACK, GAME_JOIN, GAME_LEAVE, GAME_RESIGN, MOVE_KING_SIDE_CASTLE, MOVE_PIECE,
-        MOVE_PROMOTION, MOVE_QUEEN_SIDE_CASTLE, PIECE_BISHOP, PIECE_KING, PIECE_KNIGHT, PIECE_PAWN,
-        PIECE_QUEEN, PIECE_ROOK,
+        COLOR_BLACK, GAME_JOIN, GAME_LEAVE, GAME_RESIGN, PIECE_BISHOP, PIECE_KING, PIECE_KNIGHT,
+        PIECE_PAWN, PIECE_QUEEN, PIECE_ROOK,
     },
     game_command::GameCmd,
 };
@@ -13,7 +12,7 @@ use state::{
         COOLDOWN_ROOK,
     },
     coordinate::Coord,
-    piece::{Color, Move, Piece},
+    piece::{Color, Piece},
 };
 
 impl From<u8> for Color {
@@ -59,6 +58,17 @@ impl From<u8> for Piece {
     }
 }
 
+impl From<Command> for GameCmd {
+    fn from(value: Command) -> Self {
+        match value {
+            [GAME_JOIN, p1, p2, p3] => GameCmd::Join(String::from_utf8(vec![p1, p2, p3]).unwrap()),
+            [GAME_LEAVE, ..] => GameCmd::Leave,
+            [GAME_RESIGN, ..] => GameCmd::Resign,
+            [cmd, ..] => panic!("invalid lead byte {cmd}"),
+        }
+    }
+}
+
 impl From<Command> for Move {
     fn from(value: Command) -> Self {
         match value {
@@ -66,17 +76,6 @@ impl From<Command> for Move {
             [MOVE_PROMOTION, ..] => decode_promotion(&value),
             [MOVE_KING_SIDE_CASTLE, ..] => decode_ksc(&value),
             [MOVE_QUEEN_SIDE_CASTLE, ..] => decode_qsc(&value),
-            [cmd, ..] => panic!("invalid lead byte {cmd}"),
-        }
-    }
-}
-
-impl From<Command> for GameCmd {
-    fn from(value: Command) -> Self {
-        match value {
-            [GAME_JOIN, p1, p2, p3] => GameCmd::Join(String::from_utf8(vec![p1, p2, p3]).unwrap()),
-            [GAME_LEAVE, ..] => GameCmd::Leave,
-            [GAME_RESIGN, ..] => GameCmd::Resign,
             [cmd, ..] => panic!("invalid lead byte {cmd}"),
         }
     }

@@ -6,16 +6,23 @@ edition = "2021"
 [dependencies]
 colored = "2.0.4"
 threadpool = "1.8.1"
+network = {path = "network/" }
+state = {path = "state/" }
+
+[workspace.package]
+authors = ["Damoon Rashidi"]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/damoonrashidi/action_chess"
 
 [workspace]
-
+resolver = "2"
 members = [
-    "src/state",
-    "src/network",
-    "src/bin/server"
+    "state",
+    "network",
+    "server"
 ]
 
 [[bin]]
-name = "server"
-test = false
-bench = false
+name = "chess-server"
+path = "server/main.rs"
