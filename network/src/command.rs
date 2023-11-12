@@ -1,16 +1,14 @@
-use state::piece::Move;
-
 /**
 A command is 4 bytes represented by a `[u8; 4]`.
 This is all data needed to represent a move, and thus will be all that is sent over the wire during a game.
 
-The first byte indicatates what kind of move it is.
+The first byte indicates what kind of move it is.
 
 0. Piece
 1. Promotion
 2. King Side Castle
 3. Queen Side Castle
---
+----------
 16. Join
 32. Leave
 48. Resign
@@ -23,9 +21,7 @@ The fourth byte is an EMPTY buffer byte
 ### In the case of (1) Promotion:
 
 The second byte is the "from" `Coord` sent as a u8 0..64 translated to (file, rank).
-
 The third byte is the "to" `Coord` sent as a u8 0..64 translated to (file, rank).
-
 The forth byte is a u8 representing a Piece where the 4 most significant bits are a piece representation.
 
 ```markdown
@@ -36,13 +32,12 @@ Rook = 4
 Queen = 5
 King = 6
 ```
-**Note: Pawn and King promotions are illegal moves.**
 
-The four least significant bits are a color representation:
 ```markdown
 0 = White
 1 = Black
 ```
+**Note: Pawn and King promotions are illegal moves.**
 Thus `0b0101_0001` is a black queen.
 
 ### In the case of (2) King Side Castle

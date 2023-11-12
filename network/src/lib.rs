@@ -1,4 +1,3 @@
-#[allow(clippy::cast_sign_loss)]
 #[deny(clippy::all, clippy::pedantic, rustdoc::all)]
 pub mod command;
 pub mod game_command;

@@ -7,8 +7,7 @@ use std::{
     thread,
 };
 
-use network::game_command::GameCmd;
-use state::piece::Move;
+use network::{game_command::GameCmd, unmarshal::Unmarshal};
 use world::world_state::WorldState;
 
 fn main() -> Result<()> {
@@ -22,7 +21,7 @@ fn main() -> Result<()> {
 
             let (_, addr) = socket.recv_from(&mut msg)?;
             match msg[0] {
-                0..=3 => println!("{}", Move::from(msg)),
+                0..=3 => println!("{}", Unmarshal::command(msg)),
                 _ => {
                     let cmd: GameCmd = msg.into();
                     match cmd {
