@@ -21,13 +21,8 @@ members = [
     "state",
     "network",
     "server",
-    "tui-client"
 ]
 
 [[bin]]
 name = "chess-server"
 path = "server/main.rs"
-
-[[bin]]
-name = "tui-chess-client"
-path ="tui-client/main.rs"
