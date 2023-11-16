@@ -7,5 +7,5 @@ pub mod encode;
 pub mod piece;
 pub mod square;
 
-mod movegen;
+pub mod movegen;
 mod tests;

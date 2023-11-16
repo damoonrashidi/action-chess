@@ -42,9 +42,7 @@ impl Marshal {
     }
 
     pub fn coord(value: Coord) -> u8 {
-        #[allow(clippy::cast_sign_loss)]
         let file = value.0 as u8;
-        #[allow(clippy::cast_sign_loss)]
         let rank = value.1 as u8;
         rank * 8 + file
     }
