@@ -6,3 +6,6 @@ authors.workspace = true
 
 [dependencies]
 state = { "path" = "../state" }
+
+[lints]
+workspace = true

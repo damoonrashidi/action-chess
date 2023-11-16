@@ -8,6 +8,9 @@ edition.workspace = true
 state = { path = "../state" }
 network = { path = "../network" }
 
+[lints]
+workspace = true
+
 [[bin]]
 name = "server"
 path = "main.rs"

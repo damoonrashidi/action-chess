@@ -23,6 +23,14 @@ members = [
     "server",
 ]
 
+[workspace.lints.clippy]
+"all" = "deny"
+"pedantic" = "deny"
+"lints.rustdoc.all" = "deny"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
 [[bin]]
 name = "chess-server"
 path = "server/main.rs"
