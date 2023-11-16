@@ -16,6 +16,7 @@ use state::{
     piece::{Color, Move, Piece},
 };
 
+#[derive(Debug)]
 pub struct Unmarshal;
 
 impl Unmarshal {

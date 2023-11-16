@@ -14,6 +14,7 @@ use super::{
 use crate::piece::Color;
 use colored::Colorize;
 
+#[derive(Debug)]
 pub struct MoveGen<'board> {
     board: &'board Board,
 }

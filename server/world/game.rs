@@ -6,26 +6,27 @@ use std::{
 use state::board::Board;
 
 #[derive(Debug)]
-pub struct Game {
+pub(crate) struct Game {
     players: HashSet<SocketAddr>,
-    pub board: Board,
+    #[allow(unused)]
+    board: Board,
 }
 
 impl Game {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             players: HashSet::new(),
             board: Board::new(),
         }
     }
 
-    pub fn add_player(&mut self, player: SocketAddr) {
+    pub(crate) fn add_player(&mut self, player: SocketAddr) {
         self.players.insert(player);
     }
 
     #[must_use]
     #[allow(unused)]
-    pub fn get_players(&self) -> Iter<'_, SocketAddr> {
+    pub(crate) fn get_players(&self) -> Iter<'_, SocketAddr> {
         self.players.iter()
     }
 }

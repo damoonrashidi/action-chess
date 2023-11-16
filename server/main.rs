@@ -1,5 +1,4 @@
 mod world;
-
 use std::{
     io::Result,
     net::UdpSocket,

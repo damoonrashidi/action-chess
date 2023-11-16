@@ -1,2 +1,2 @@
-pub mod game;
-pub mod state;
+pub(crate) mod game;
+pub(crate) mod state;

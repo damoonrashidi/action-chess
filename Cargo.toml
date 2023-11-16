@@ -24,12 +24,18 @@ members = [
 ]
 
 [workspace.lints.clippy]
-"all" = "deny"
-"pedantic" = "deny"
-"lints.rustdoc.all" = "deny"
+all = "deny"
+pedantic = "deny"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
+dead_code = "deny"
+unused_variables = "deny"
+unused_imports = "deny"
+unused_import_braces = "deny"
+missing_debug_implementations = "deny"
+unreachable_pub = "deny"
+
 
 [[bin]]
 name = "chess-server"

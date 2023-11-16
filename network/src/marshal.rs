@@ -16,6 +16,7 @@ use super::{
     game_command::GameCmd,
 };
 
+#[derive(Debug)]
 pub struct Marshal;
 
 impl Marshal {
