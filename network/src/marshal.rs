@@ -19,6 +19,7 @@ use super::{
 pub struct Marshal;
 
 impl Marshal {
+    #[must_use]
     pub fn color(value: Color) -> u8 {
         match value {
             Color::White => COLOR_WHITE,
@@ -26,6 +27,7 @@ impl Marshal {
         }
     }
 
+    #[must_use]
     pub fn piece(value: Piece) -> u8 {
         let color = match value.get_color() {
             Color::White => COLOR_WHITE,
@@ -41,12 +43,15 @@ impl Marshal {
         }
     }
 
+    #[must_use]
+    #[allow(clippy::cast_sign_loss)]
     pub fn coord(value: Coord) -> u8 {
         let file = value.0 as u8;
         let rank = value.1 as u8;
         rank * 8 + file
     }
 
+    #[must_use]
     pub fn command(value: Move) -> Command {
         match value {
             Move::Piece(from, to) => [
@@ -76,6 +81,7 @@ impl Marshal {
         }
     }
 
+    #[must_use]
     pub fn game_command(value: GameCmd) -> Command {
         match value {
             GameCmd::Join(game_id) => {

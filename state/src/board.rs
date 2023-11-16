@@ -144,9 +144,11 @@ impl Board {
         if !position.is_valid() {
             return &None;
         }
+        #[allow(clippy::cast_sign_loss)]
         &self.pieces[position.1 as usize][position.0 as usize]
     }
 
+    #[allow(clippy::cast_sign_loss)]
     pub fn set_piece_at(&mut self, piece: Option<Piece>, position: Coord) {
         self.pieces[position.1 as usize][position.0 as usize] = piece;
     }
@@ -248,6 +250,7 @@ impl Board {
                 self.pieces[src_file][2] = Some(Piece::King(color, COOLDOWN_KING));
                 self.pieces[src_file][2] = Some(Piece::Rook(color, COOLDOWN_ROOK));
             }
+            #[allow(clippy::cast_sign_loss)]
             Move::Promotion(src, dest, piece) => {
                 self.pieces[src.1 as usize][src.0 as usize] = None;
                 self.pieces[dest.1 as usize][dest.0 as usize] = Some(piece);

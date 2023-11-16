@@ -19,6 +19,7 @@ use state::{
 pub struct Unmarshal;
 
 impl Unmarshal {
+    #[must_use]
     pub fn color(value: u8) -> Color {
         if value & COLOR_BLACK == COLOR_BLACK {
             Color::Black
@@ -27,6 +28,7 @@ impl Unmarshal {
         }
     }
 
+    #[must_use]
     pub fn coord(value: u8) -> Coord {
         let file = value % 8;
         let rank = value / 8;
@@ -34,6 +36,11 @@ impl Unmarshal {
         Coord(file as i8, rank as i8)
     }
 
+    /**
+    # Panics
+    The function will panic if the byte is not a valid piece.
+     */
+    #[must_use]
     pub fn piece(value: u8) -> Piece {
         let color: Color = Unmarshal::color(value & 1);
 
@@ -56,6 +63,11 @@ impl Unmarshal {
         panic!("could not decode {value}");
     }
 
+    /**
+    # Panics
+    The function will panic if the first byte in the command cannot be decoded.
+     */
+    #[must_use]
     pub fn command(value: Command) -> Move {
         match value[0] {
             MOVE_PIECE => Unmarshal::decode_move(&value),

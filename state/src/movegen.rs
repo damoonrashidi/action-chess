@@ -19,10 +19,12 @@ pub struct MoveGen<'board> {
 }
 
 impl<'board> MoveGen<'board> {
+    #[must_use]
     pub fn new(board: &'board Board) -> Self {
         Self { board }
     }
 
+    #[must_use]
     pub fn get_possible_moves(&self) -> Vec<Move> {
         let num_threads = self.board.get_piece_count();
         let pool = ThreadPool::new(num_threads);
@@ -32,6 +34,7 @@ impl<'board> MoveGen<'board> {
         for y in 0..8 {
             for x in 0..8 {
                 if let Some(piece) = self.board.pieces[y][x] {
+                    #[allow(clippy::cast_possible_truncation)]
                     let coord = Coord(x as i8, y as i8);
                     let s = s.clone();
                     let board = board.clone();
@@ -45,7 +48,7 @@ impl<'board> MoveGen<'board> {
                             Piece::Queen(_, _) => gen.for_queen(&piece, coord),
                             Piece::King(_, _) => gen.for_king(&piece, coord),
                         };
-                        s.send(moves).unwrap();
+                        let _ = s.send(moves);
                     });
                 }
             }
@@ -54,6 +57,7 @@ impl<'board> MoveGen<'board> {
         r.iter().take(num_threads).flatten().collect()
     }
 
+    #[must_use]
     pub fn get_possible_moves_for_color(&self, color: Color) -> Vec<Move> {
         let num_pieces_with_color: usize = self.board.get_piece_count();
         let pool = ThreadPool::new(num_pieces_with_color);
@@ -66,6 +70,7 @@ impl<'board> MoveGen<'board> {
                     let s = s.clone();
                     let board = board.clone();
                     pool.execute(move || {
+                        #[allow(clippy::cast_possible_truncation)]
                         let coord = Coord(x as i8, y as i8);
                         let gen = MoveGen::new(&board);
                         let moves = match (piece, color == piece.get_color()) {
@@ -77,7 +82,7 @@ impl<'board> MoveGen<'board> {
                             (Piece::King(_, _), true) => gen.for_king(&piece, coord),
                             _ => vec![],
                         };
-                        s.send(moves).unwrap();
+                        let _ = s.send(moves);
                     });
                 }
             }
@@ -86,6 +91,7 @@ impl<'board> MoveGen<'board> {
         r.iter().take(num_pieces_with_color).flatten().collect()
     }
 
+    #[must_use]
     pub fn for_pawn(&self, piece: &Piece, pos: Coord) -> Vec<Move> {
         if !piece.get_cooldown().is_zero() {
             return vec![];
@@ -152,6 +158,7 @@ impl<'board> MoveGen<'board> {
             .collect()
     }
 
+    #[must_use]
     pub fn for_knight(&self, piece: &Piece, pos: Coord) -> Vec<Move> {
         if !piece.get_cooldown().is_zero() {
             return vec![];
@@ -189,6 +196,7 @@ impl<'board> MoveGen<'board> {
         .collect()
     }
 
+    #[must_use]
     pub fn for_rook(&self, piece: &Piece, pos: Coord) -> Vec<Move> {
         if !piece.get_cooldown().is_zero() {
             return vec![];
@@ -220,6 +228,7 @@ impl<'board> MoveGen<'board> {
             .collect()
     }
 
+    #[must_use]
     pub fn for_bishop(&self, piece: &Piece, pos: Coord) -> Vec<Move> {
         if !piece.get_cooldown().is_zero() {
             return vec![];
@@ -250,6 +259,7 @@ impl<'board> MoveGen<'board> {
             .collect()
     }
 
+    #[must_use]
     pub fn for_queen(&self, piece: &Piece, pos: Coord) -> Vec<Move> {
         [self.for_bishop(piece, pos), self.for_rook(piece, pos)]
             .into_iter()
@@ -257,6 +267,7 @@ impl<'board> MoveGen<'board> {
             .collect()
     }
 
+    #[must_use]
     pub fn for_king(&self, piece: &Piece, pos: Coord) -> Vec<Move> {
         if !piece.get_cooldown().is_zero() {
             return vec![];
@@ -406,6 +417,7 @@ impl<'board> MoveGen<'board> {
             for x in 0..8 {
                 render = match (
                     board.pieces[y][x],
+                    #[allow(clippy::cast_possible_truncation)]
                     targets.contains(&Coord(x as i8, y as i8)),
                 ) {
                     (None, true) => format!("{render}| o "),

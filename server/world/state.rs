@@ -3,13 +3,13 @@ use std::{collections::HashMap, net::SocketAddr};
 use super::game::Game;
 #[allow(unused)]
 #[derive(Default, Debug)]
-pub struct WorldState {
+pub struct State {
     games: HashMap<String, Game>,
     participants: HashMap<SocketAddr, String>,
 }
 
 #[allow(unused)]
-impl WorldState {
+impl State {
     #[must_use]
     pub fn new() -> Self {
         Self {
