@@ -16,7 +16,7 @@ impl Game {
     pub(crate) fn new() -> Self {
         Self {
             players: HashSet::new(),
-            board: Board::new(),
+            board: Board::standard(),
         }
     }
 

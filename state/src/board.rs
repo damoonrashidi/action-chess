@@ -10,7 +10,7 @@ use super::{
 use core::fmt;
 use std::{fmt::Debug, time::Duration};
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 #[allow(clippy::struct_excessive_bools)]
 pub struct Board {
     pub pieces: [[Option<Piece>; 8]; 8],
@@ -23,7 +23,7 @@ pub struct Board {
 
 impl Board {
     #[must_use]
-    pub fn new() -> Self {
+    pub fn standard() -> Self {
         let mut pieces: [[Option<Piece>; 8]; 8] = [[None; 8]; 8];
 
         pieces[1] = [Some(Piece::Pawn(Color::White, COOLDOWN_PAWN)); 8];
@@ -61,74 +61,14 @@ impl Board {
     }
 
     #[must_use]
-    pub fn from_fen(fen: &str) -> Option<Self> {
-        let parts = fen.split_whitespace().collect::<Vec<&str>>();
-        let positions = parts.first()?;
-        let mut pieces: [[Option<Piece>; 8]; 8] = [[None; 8]; 8];
-
-        let mut file = 0;
-        let mut rank = 7;
-        for c in positions.chars() {
-            if c == '/' {
-                file = 0;
-                rank -= 1;
-            }
-
-            if ('0'..'8').contains(&c) {
-                if let Ok(empties) = c.to_string().parse::<usize>() {
-                    for _ in 0..empties {
-                        pieces[rank][file] = None;
-                        file += 1;
-                        continue;
-                    }
-                }
-            }
-            let piece = match c {
-                'p' => Some(Piece::Pawn(Color::Black, COOLDOWN_PAWN)),
-                'b' => Some(Piece::Bishop(Color::Black, COOLDOWN_BISHOP)),
-                'n' => Some(Piece::Knight(Color::Black, COOLDOWN_KNIGHT)),
-                'r' => Some(Piece::Rook(Color::Black, COOLDOWN_ROOK)),
-                'q' => Some(Piece::Queen(Color::Black, COOLDOWN_QUEEN)),
-                'k' => Some(Piece::King(Color::Black, COOLDOWN_KING)),
-                'P' => Some(Piece::Pawn(Color::White, COOLDOWN_PAWN)),
-                'B' => Some(Piece::Bishop(Color::White, COOLDOWN_BISHOP)),
-                'N' => Some(Piece::Knight(Color::White, COOLDOWN_KNIGHT)),
-                'R' => Some(Piece::Rook(Color::White, COOLDOWN_ROOK)),
-                'Q' => Some(Piece::Queen(Color::White, COOLDOWN_QUEEN)),
-                'K' => Some(Piece::King(Color::White, COOLDOWN_KING)),
-                _ => None,
-            };
-            if file < 8 {
-                pieces[rank][file] = piece;
-                if piece.is_some() {
-                    file += 1;
-                }
-            }
+    pub fn empty() -> Self {
+        Self {
+            pieces: [[None; 8]; 8],
+            white_can_castle_kingside: false,
+            white_can_castle_queenside: false,
+            black_can_castle_kingside: false,
+            black_can_castle_queenside: false,
         }
-
-        let castle_rights = parts.get(2)?;
-        let mut black_kingside = false;
-        let mut white_kingside = false;
-        let mut black_queenside = false;
-        let mut white_queenside = false;
-
-        for c in castle_rights.chars() {
-            match c {
-                'k' => black_kingside = true,
-                'K' => white_kingside = true,
-                'q' => black_queenside = true,
-                'Q' => white_queenside = true,
-                _ => {}
-            }
-        }
-
-        Some(Board {
-            pieces,
-            white_can_castle_kingside: white_kingside,
-            white_can_castle_queenside: white_queenside,
-            black_can_castle_kingside: black_kingside,
-            black_can_castle_queenside: black_queenside,
-        })
     }
 
     #[must_use]
@@ -314,6 +254,84 @@ impl Board {
             Move::Piece(_src, _dest) => true,
             Move::Promotion(_src, _dest, _piece) => true,
         }
+    }
+}
+
+impl From<&str> for Board {
+    fn from(fen: &str) -> Board {
+        let parts = fen.split_whitespace().collect::<Vec<&str>>();
+        let positions = parts.first().expect("{fen} is not a valid FEN");
+        let mut pieces: [[Option<Piece>; 8]; 8] = [[None; 8]; 8];
+
+        let mut file = 0;
+        let mut rank = 7;
+        for c in positions.chars() {
+            if c == '/' {
+                file = 0;
+                rank -= 1;
+            }
+
+            if ('0'..'8').contains(&c) {
+                if let Ok(empties) = c.to_string().parse::<usize>() {
+                    for _ in 0..empties {
+                        pieces[rank][file] = None;
+                        file += 1;
+                        continue;
+                    }
+                }
+            }
+            let piece = match c {
+                'p' => Some(Piece::Pawn(Color::Black, COOLDOWN_PAWN)),
+                'b' => Some(Piece::Bishop(Color::Black, COOLDOWN_BISHOP)),
+                'n' => Some(Piece::Knight(Color::Black, COOLDOWN_KNIGHT)),
+                'r' => Some(Piece::Rook(Color::Black, COOLDOWN_ROOK)),
+                'q' => Some(Piece::Queen(Color::Black, COOLDOWN_QUEEN)),
+                'k' => Some(Piece::King(Color::Black, COOLDOWN_KING)),
+                'P' => Some(Piece::Pawn(Color::White, COOLDOWN_PAWN)),
+                'B' => Some(Piece::Bishop(Color::White, COOLDOWN_BISHOP)),
+                'N' => Some(Piece::Knight(Color::White, COOLDOWN_KNIGHT)),
+                'R' => Some(Piece::Rook(Color::White, COOLDOWN_ROOK)),
+                'Q' => Some(Piece::Queen(Color::White, COOLDOWN_QUEEN)),
+                'K' => Some(Piece::King(Color::White, COOLDOWN_KING)),
+                _ => None,
+            };
+            if file < 8 {
+                pieces[rank][file] = piece;
+                if piece.is_some() {
+                    file += 1;
+                }
+            }
+        }
+
+        let castle_rights = parts.get(2).expect("{fen} is not a valid fen");
+        let mut black_kingside = false;
+        let mut white_kingside = false;
+        let mut black_queenside = false;
+        let mut white_queenside = false;
+
+        for c in castle_rights.chars() {
+            match c {
+                'k' => black_kingside = true,
+                'K' => white_kingside = true,
+                'q' => black_queenside = true,
+                'Q' => white_queenside = true,
+                _ => {}
+            }
+        }
+
+        Board {
+            pieces,
+            white_can_castle_kingside: white_kingside,
+            white_can_castle_queenside: white_queenside,
+            black_can_castle_kingside: black_kingside,
+            black_can_castle_queenside: black_queenside,
+        }
+    }
+}
+
+impl Default for Board {
+    fn default() -> Self {
+        Self::empty()
     }
 }
 
