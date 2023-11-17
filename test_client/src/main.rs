@@ -18,21 +18,17 @@ fn main() -> std::io::Result<()> {
     client.join_game("abc");
 
     let b = Arc::clone(&board);
-    println!("spawning thread to listen for commands");
     let handle = thread::spawn(move || {
         for mv in channel {
-            println!("{mv}");
             let mut board = b.lock().unwrap();
             board.process_move(mv);
             println!("{board}");
         }
     });
 
-    println!("thread has been spawned");
     client.make_move(Move::Piece(E2, E4));
 
     let _ = handle.join();
-    println!("game is about to exit");
 
     Ok(())
 }

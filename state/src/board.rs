@@ -155,10 +155,6 @@ impl Board {
     }
 
     pub fn process_move(&mut self, m: Move) -> &Self {
-        if !self.is_valid_move(m) {
-            return self;
-        }
-
         match m {
             Move::Piece(from, to) => {
                 if let Some(mut piece) = self.get_piece_at(&from) {
@@ -233,6 +229,7 @@ impl Board {
         }
     }
 
+    #[allow(unused)]
     fn is_valid_move(&self, mv: Move) -> bool {
         let gen = MoveGen::new(self);
 
@@ -251,8 +248,7 @@ impl Board {
                 Color::White => self.white_can_castle_queenside,
                 Color::Black => self.black_can_castle_queenside,
             },
-            Move::Piece(_src, _dest) => true,
-            Move::Promotion(_src, _dest, _piece) => true,
+            _ => true,
         }
     }
 }
