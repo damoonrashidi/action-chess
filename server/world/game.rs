@@ -3,12 +3,11 @@ use std::{
     net::SocketAddr,
 };
 
-use state::board::Board;
+use state::{board::Board, piece::Move};
 
 #[derive(Debug)]
 pub(crate) struct Game {
     players: HashSet<SocketAddr>,
-    #[allow(unused)]
     board: Board,
 }
 
@@ -24,9 +23,16 @@ impl Game {
         self.players.insert(player);
     }
 
-    #[must_use]
     #[allow(unused)]
+    pub(crate) fn remove_player(&mut self, player: SocketAddr) {
+        self.players.remove(&player);
+    }
+
     pub(crate) fn get_players(&self) -> Iter<'_, SocketAddr> {
         self.players.iter()
+    }
+
+    pub(crate) fn make_move(&mut self, mv: Move) {
+        self.board.process_move(mv);
     }
 }

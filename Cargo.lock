@@ -6,6 +6,7 @@ version = 3
 name = "action-chess"
 version = "0.1.0"
 dependencies = [
+ "chess_client",
  "colored",
  "network",
  "state",
@@ -17,6 +18,14 @@ name = "bitflags"
 version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "327762f6e5a765692301e5bb513e0d9fef63be86bbc14528052b1cd3e6f03e07"
+
+[[package]]
+name = "chess_client"
+version = "0.1.0"
+dependencies = [
+ "network",
+ "state",
+]
 
 [[package]]
 name = "colored"
@@ -118,6 +127,14 @@ version = "0.1.0"
 dependencies = [
  "colored",
  "threadpool",
+]
+
+[[package]]
+name = "test-client"
+version = "0.1.0"
+dependencies = [
+ "chess_client",
+ "state",
 ]
 
 [[package]]

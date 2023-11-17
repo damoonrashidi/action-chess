@@ -8,6 +8,7 @@ colored = "2.0.4"
 threadpool = "1.8.1"
 network = {path = "network/" }
 state = {path = "state/" }
+chess_client = {path = "chess_client/"}
 
 [workspace.package]
 authors = ["Damoon Rashidi"]
@@ -21,6 +22,8 @@ members = [
     "state",
     "network",
     "server",
+    "chess_client",
+    "test_client"
 ]
 
 [workspace.lints.clippy]
@@ -38,5 +41,9 @@ unreachable_pub = "deny"
 
 
 [[bin]]
-name = "chess-server"
+name = "game_server"
 path = "server/main.rs"
+
+[[bin]]
+name = "debug_client"
+path = "test_client/src/main.rs"

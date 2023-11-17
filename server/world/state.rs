@@ -1,14 +1,12 @@
 use std::{collections::HashMap, net::SocketAddr};
 
 use super::game::Game;
-#[allow(unused)]
 #[derive(Default, Debug)]
 pub(crate) struct State {
     games: HashMap<String, Game>,
     participants: HashMap<SocketAddr, String>,
 }
 
-#[allow(unused)]
 impl State {
     #[must_use]
     pub(crate) fn new() -> Self {
@@ -36,6 +34,7 @@ impl State {
     pub(crate) fn add_player(&mut self, player: SocketAddr, game_id: &String) -> Option<()> {
         let game = self.games.get_mut(game_id)?;
         game.add_player(player);
+        self.participants.insert(player, game_id.to_string());
 
         None
     }
