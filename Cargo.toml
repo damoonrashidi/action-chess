@@ -4,17 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-colored = "2.0.4"
-threadpool = "1.8.1"
+anyhow = "1.0.75"
 network = {path = "network/" }
 state = {path = "state/" }
 chess_client = {path = "chess_client/"}
-
-[workspace.package]
-authors = ["Damoon Rashidi"]
-edition = "2021"
-license = "MIT"
-repository = "https://github.com/damoonrashidi/action_chess"
 
 [workspace]
 resolver = "2"
@@ -25,6 +18,19 @@ members = [
     "chess_client",
     "test_client"
 ]
+
+[workspace.dependencies]
+anyhow = "1.0.75"
+colored = "2.0.4"
+threadpool = "1.8.1"
+
+
+[workspace.package]
+authors = ["Damoon Rashidi"]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/damoonrashidi/action-chess/"
+
 
 [workspace.lints.clippy]
 all = "deny"
