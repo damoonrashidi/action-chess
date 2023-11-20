@@ -35,6 +35,7 @@ fn main() -> Result<()> {
             if let 0..=3 = msg[0] {
                 let mut world = world.lock().unwrap();
                 let mv = Unmarshal::command(msg);
+                println!("{addr} is making move {mv}");
                 if let Some(game) = world.get_game_for_player_mut(&addr) {
                     if game.is_valid_move(&mv) {
                         game.make_move(&mv);
@@ -51,9 +52,9 @@ fn main() -> Result<()> {
                 match cmd {
                     GameCmd::Join(game_id) => {
                         let mut world = world.lock().unwrap();
-                        if let Some(game) = world.get_game_mut(&game_id) {
+                        if world.get_game_mut(&game_id).is_some() {
                             println!("{addr} joined {game_id}");
-                            game.add_player(addr);
+                            world.add_player(addr, &game_id);
                         } else {
                             println!("{addr} created {game_id}");
                             world.create_game(&game_id);

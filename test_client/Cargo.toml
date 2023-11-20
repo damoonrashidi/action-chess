@@ -8,6 +8,7 @@ repository.workspace = true
 
 [dependencies]
 anyhow = { workspace = true }
+clap = { workspace = true }
 chess_client = { path = "../chess_client" }
 state = { path = "../state" }
 

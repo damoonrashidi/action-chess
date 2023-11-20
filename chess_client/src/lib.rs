@@ -16,9 +16,9 @@ impl ChessClient {
     /// # Errors
     ///
     /// This function will return an error if you cannot bind to the host UDP socket.
-    pub fn new(host: &'static str) -> std::io::Result<Self> {
-        let connection = UdpSocket::bind("127.0.0.1:8000")?;
-        let _ = connection.connect(host);
+    pub fn new(port: &String, host: &String) -> std::io::Result<Self> {
+        let connection = UdpSocket::bind(format!("127.0.0.1:{port}"))?;
+        connection.connect(host)?;
         Ok(Self { connection })
     }
 
