@@ -16,6 +16,10 @@ impl State {
         }
     }
 
+    pub(crate) fn games_mut(&mut self) -> std::collections::hash_map::ValuesMut<'_, String, Game> {
+        self.games.values_mut()
+    }
+
     pub(crate) fn get_game_mut(&mut self, game_id: &String) -> Option<&mut Game> {
         self.games.get_mut(game_id)
     }

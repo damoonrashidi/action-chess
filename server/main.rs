@@ -3,7 +3,8 @@ use std::{
     io::Result,
     net::UdpSocket,
     sync::{Arc, Mutex},
-    thread,
+    thread::{self, sleep},
+    time::Duration,
 };
 
 use network::{game_command::GameCmd, unmarshal::Unmarshal};
@@ -15,6 +16,16 @@ fn main() -> Result<()> {
 
     let world = Arc::new(Mutex::new(State::new()));
 
+    let tick_world = Arc::clone(&world);
+    let tick_thread = thread::spawn(move || loop {
+        if let Ok(mut world) = tick_world.lock() {
+            for game in world.games_mut() {
+                game.tick();
+            }
+        }
+        sleep(Duration::from_millis(16));
+    });
+
     let thread = thread::spawn(move || -> Result<()> {
         loop {
             let mut msg: [u8; 4] = [0, 0, 0, 0];
@@ -25,10 +36,15 @@ fn main() -> Result<()> {
                 let mut world = world.lock().unwrap();
                 let mv = Unmarshal::command(msg);
                 if let Some(game) = world.get_game_for_player_mut(&addr) {
-                    game.make_move(mv);
-                    game.get_players().for_each(|player| {
-                        let _ = socket.send_to(&msg, player);
-                    });
+                    if game.is_valid_move(&mv) {
+                        game.make_move(&mv);
+                        game.get_players().for_each(|player| {
+                            println!("sending {mv} to {player}");
+                            let _ = socket.send_to(&msg, player);
+                        });
+                    } else {
+                        println!("{addr} tried to make illegal move {mv}");
+                    }
                 }
             } else {
                 let cmd: GameCmd = msg.into();
@@ -36,8 +52,10 @@ fn main() -> Result<()> {
                     GameCmd::Join(game_id) => {
                         let mut world = world.lock().unwrap();
                         if let Some(game) = world.get_game_mut(&game_id) {
+                            println!("{addr} joined {game_id}");
                             game.add_player(addr);
                         } else {
+                            println!("{addr} created {game_id}");
                             world.create_game(&game_id);
                             world.add_player(addr, &game_id);
                         }
@@ -50,6 +68,7 @@ fn main() -> Result<()> {
     });
 
     let _ = thread.join();
+    let _ = tick_thread.join();
 
     Ok(())
 }

@@ -160,8 +160,6 @@ impl Board {
                 if let Some(mut piece) = self.get_piece_at(&from) {
                     piece.set_cooldown(Piece::std_piece_cooldown(&piece));
                     self.set_piece_at(Some(piece), to);
-                } else {
-                    self.set_piece_at(None, to);
                 }
                 self.set_piece_at(None, from);
             }
@@ -217,13 +215,11 @@ impl Board {
         for y in 0..8 {
             for x in 0..8 {
                 if let Some(mut piece) = self.pieces[y][x] {
-                    let cd = piece.get_cooldown();
-                    let new_cd = if let Some(new_cd) = cd.checked_sub(Duration::from_millis(16)) {
-                        new_cd
-                    } else {
-                        Duration::ZERO
-                    };
+                    let new_cd = piece
+                        .get_cooldown()
+                        .saturating_sub(Duration::from_millis(16));
                     piece.set_cooldown(new_cd);
+                    self.pieces[y][x] = Some(piece);
                 }
             }
         }

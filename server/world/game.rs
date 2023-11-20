@@ -3,12 +3,12 @@ use std::{
     net::SocketAddr,
 };
 
-use state::{board::Board, piece::Move};
+use state::{board::Board, movegen::MoveGen, piece::Move};
 
 #[derive(Debug)]
 pub(crate) struct Game {
     players: HashSet<SocketAddr>,
-    board: Board,
+    pub(crate) board: Board,
 }
 
 impl Game {
@@ -32,7 +32,16 @@ impl Game {
         self.players.iter()
     }
 
-    pub(crate) fn make_move(&mut self, mv: Move) {
-        self.board.process_move(mv);
+    pub(crate) fn make_move(&mut self, mv: &Move) {
+        self.board.process_move(*mv);
+    }
+
+    pub(crate) fn is_valid_move(&self, mv: &Move) -> bool {
+        let gen = MoveGen::new(&self.board);
+        gen.get_possible_moves().contains(mv)
+    }
+
+    pub(crate) fn tick(&mut self) {
+        self.board.tick();
     }
 }
