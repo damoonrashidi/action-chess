@@ -1,7 +1,8 @@
 use std::{
     io::stdin,
     sync::{Arc, Mutex},
-    thread,
+    thread::{self},
+    time::Duration,
 };
 
 use chess_client::ChessClient;
@@ -13,6 +14,7 @@ use state::{
         COOLDOWN_ROOK,
     },
     coordinate::Coord,
+    movegen::MoveGen,
     piece::{Color, Move, Piece},
 };
 
@@ -46,7 +48,9 @@ fn main() -> anyhow::Result<()> {
         for mv in move_listener {
             let mut board = remote_board.lock().unwrap();
             board.process_move(mv);
-            println!("{board}");
+            let gen = MoveGen::new(&board);
+            let moves = gen.get_possible_moves_for_color(Color::White);
+            MoveGen::render_movelist(&board, &moves);
         }
     });
 
@@ -61,28 +65,33 @@ fn main() -> anyhow::Result<()> {
                 remote_client.make_move(mv);
             } else {
                 println!(
-                    "could not parse {} into move, boardstate unchanged",
+                    "could not parse {} into move, board state unchanged",
                     str.trim()
                 );
-                if let Ok(board) = board.lock() {
-                    println!("{board}");
-                }
             }
         }
     });
 
+    let board_loop = thread::spawn(move || loop {
+        if let Ok(mut board) = board.lock() {
+            board.tick();
+        }
+        thread::sleep(Duration::from_millis(16));
+    });
+
     let _ = incoming_commands.join();
     let _ = read_moves.join();
+    let _ = board_loop.join();
 
     Ok(())
 }
 
 fn parse_move(move_str: &str) -> Option<Move> {
     let castling = match move_str {
-        "o-o-o" => Some(Move::QueenSideCastle(Color::White)),
-        "O-O-O" => Some(Move::QueenSideCastle(Color::Black)),
         "o-o" => Some(Move::KingSideCastle(Color::White)),
+        "o-o-o" => Some(Move::QueenSideCastle(Color::White)),
         "O-O" => Some(Move::KingSideCastle(Color::Black)),
+        "O-O-O" => Some(Move::QueenSideCastle(Color::Black)),
         _ => None,
     };
 
