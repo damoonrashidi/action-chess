@@ -19,25 +19,36 @@ Action chess is the same chess you know and love, with castling, en passant, pro
     - [x] captures
     - [x] castling
   - [x] bishop
-    - [x] moves
-    - [x] captures
   - [x] knight
-    - [x] moves
-    - [x] captures
   - [x] queen
-    - [x] moves
-    - [x] captures
   - [x] king
-    - [x] moves
-    - [x] captures
     - [x] cannot move into check
     - [x] castling
-  
- 
-## What isn't yet implemented but being worked on
 
-- [ ] Networking
-- [ ] Render to some ui
+- [x] Networking
+    - [x] Serialization / Deserialization protocol for moves and commands
+    - [x] Server state
+    - [x] Event sourcing to bring new clients to correct game state
+    - [x] Host games
+    - [x] Joining games
+
+- [x] Debug Client
+    - [x] Parse Input from STDIN
+    - [x] Render board to STDOUT
+    - [x] Send moves to the server
+    - [x] Get moves from the server
+    - [x] Tick game
+
+## What isn't yet implemented but being worked on
+- [ ] 3D Client
+    - [ ] Create Meshes for pieces
+        - [ ] Create Textures
+    - [ ] Create a Board Mesh
+        - [ ] Create a shader for the checkered texture
+    - [ ] Learn 3D programming
+    - [ ] Camera
+    - [ ] Lighting
+    - [ ] Input
 
 ## Roadmap
 
