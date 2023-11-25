@@ -3,7 +3,7 @@ use std::{
     io::Result,
     net::UdpSocket,
     sync::{Arc, Mutex},
-    thread::{self},
+    thread::{self, JoinHandle},
     time::Duration,
 };
 
@@ -11,22 +11,33 @@ use network::{game_command::GameCmd, marshal::Marshal, unmarshal::Unmarshal};
 
 use world::state::State;
 
-fn main() -> Result<()> {
-    let socket = UdpSocket::bind("127.0.0.1:8080")?;
-
+fn main() -> anyhow::Result<()> {
     let world = Arc::new(Mutex::new(State::new()));
 
-    let tick_world = Arc::clone(&world);
-    let tick_thread = thread::spawn(move || loop {
-        if let Ok(mut world) = tick_world.lock() {
+    let tick_handle = tick_world(Arc::clone(&world));
+
+    let socket = UdpSocket::bind("127.0.0.1:8080")?;
+    let command_handle = handle_commands(Arc::clone(&world), socket);
+
+    let _ = command_handle.join();
+    let _ = tick_handle.join();
+
+    Ok(())
+}
+
+fn tick_world(world: Arc<Mutex<State>>) -> JoinHandle<()> {
+    thread::spawn(move || loop {
+        if let Ok(mut world) = world.lock() {
             for game in world.games_mut() {
                 game.tick();
             }
         }
         thread::sleep(Duration::from_millis(16));
-    });
+    })
+}
 
-    let thread = thread::spawn(move || -> Result<()> {
+fn handle_commands(world: Arc<Mutex<State>>, socket: UdpSocket) -> JoinHandle<Result<()>> {
+    thread::spawn(move || -> Result<()> {
         loop {
             let mut msg: [u8; 4] = [0, 0, 0, 0];
 
@@ -69,10 +80,5 @@ fn main() -> Result<()> {
                 };
             }
         }
-    });
-
-    let _ = thread.join();
-    let _ = tick_thread.join();
-
-    Ok(())
+    })
 }
