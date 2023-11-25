@@ -110,7 +110,13 @@ impl Unmarshal {
 impl From<Command> for GameCmd {
     fn from(value: Command) -> Self {
         match value {
-            [GAME_JOIN, p1, p2, p3] => GameCmd::Join(String::from_utf8(vec![p1, p2, p3]).unwrap()),
+            [GAME_JOIN, p1, p2, p3] => {
+                if let Ok(name) = String::from_utf8(vec![p1, p2, p3]) {
+                    GameCmd::Join(name)
+                } else {
+                    panic!("invalid game name")
+                }
+            }
             [GAME_LEAVE, ..] => GameCmd::Leave,
             [GAME_RESIGN, ..] => GameCmd::Resign,
             [cmd, ..] => panic!("invalid lead byte {cmd}"),

@@ -1,10 +1,7 @@
-use std::{
-    net::{SocketAddr, UdpSocket},
-    sync::{Arc, Mutex},
-};
+use std::net::SocketAddr;
 
-use crate::world::state::State;
+use crate::world::World;
 
 pub(crate) trait Handler {
-    fn handle(player: SocketAddr, msg: [u8; 4], world: &Arc<Mutex<State>>, socket: &UdpSocket);
+    fn handle(player: SocketAddr, msg: [u8; 4], world: &mut World);
 }

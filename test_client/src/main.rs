@@ -46,11 +46,12 @@ fn main() -> anyhow::Result<()> {
     let remote_board = Arc::clone(&board);
     let incoming_commands = thread::spawn(move || {
         for mv in move_listener {
-            let mut board = remote_board.lock().unwrap();
-            board.process_move(mv);
-            let gen = MoveGen::new(&board);
-            let moves = gen.get_possible_moves_for_color(Color::White);
-            MoveGen::render_movelist(&board, &moves);
+            if let Ok(mut board) = remote_board.lock() {
+                board.process_move(mv);
+                let gen = MoveGen::new(&board);
+                let moves = gen.get_possible_moves_for_color(Color::White);
+                MoveGen::render_movelist(&board, &moves);
+            }
         }
     });
 

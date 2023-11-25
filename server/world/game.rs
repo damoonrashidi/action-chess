@@ -8,7 +8,7 @@ use state::{board::Board, movegen::MoveGen, piece::Move};
 #[derive(Debug)]
 pub(crate) struct Game {
     pub(crate) board: Board,
-    pub(crate) made_moves: Vec<Move>,
+    pub(crate) move_history: Vec<Move>,
 
     players: HashSet<SocketAddr>,
 }
@@ -18,7 +18,7 @@ impl Game {
         Self {
             players: HashSet::new(),
             board: Board::standard(),
-            made_moves: vec![],
+            move_history: vec![],
         }
     }
 
@@ -36,7 +36,7 @@ impl Game {
     }
 
     pub(crate) fn make_move(&mut self, mv: &Move) {
-        self.made_moves.push(*mv);
+        self.move_history.push(*mv);
         self.board.process_move(*mv);
     }
 
