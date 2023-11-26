@@ -4,10 +4,10 @@ use std::{
     net::UdpSocket,
     sync::{Arc, Mutex},
     thread::{self, JoinHandle},
-    time::Duration,
 };
 
 use handlers::handler::Handler;
+use state::cooldowns::BOARD_TICK_RATE;
 use world::World;
 
 fn main() -> anyhow::Result<()> {
@@ -32,7 +32,7 @@ fn tick_world(world: &Arc<Mutex<World>>) -> JoinHandle<()> {
                 game.tick();
             }
         }
-        thread::sleep(Duration::from_millis(16));
+        thread::sleep(BOARD_TICK_RATE);
     })
 }
 

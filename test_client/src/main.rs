@@ -2,7 +2,6 @@ use std::{
     io::stdin,
     sync::{Arc, Mutex},
     thread::{self},
-    time::Duration,
 };
 
 use chess_client::ChessClient;
@@ -10,8 +9,8 @@ use clap::Parser;
 use state::{
     board::Board,
     cooldowns::{
-        COOLDOWN_BISHOP, COOLDOWN_KING, COOLDOWN_KNIGHT, COOLDOWN_PAWN, COOLDOWN_QUEEN,
-        COOLDOWN_ROOK,
+        BOARD_TICK_RATE, COOLDOWN_BISHOP, COOLDOWN_KING, COOLDOWN_KNIGHT, COOLDOWN_PAWN,
+        COOLDOWN_QUEEN, COOLDOWN_ROOK,
     },
     coordinate::Coord,
     movegen::MoveGen,
@@ -77,7 +76,7 @@ fn main() -> anyhow::Result<()> {
         if let Ok(mut board) = board.lock() {
             board.tick();
         }
-        thread::sleep(Duration::from_millis(16));
+        thread::sleep(BOARD_TICK_RATE);
     });
 
     let _ = incoming_commands.join();

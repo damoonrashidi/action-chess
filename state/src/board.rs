@@ -1,14 +1,14 @@
 use super::{
     cooldowns::{
-        COOLDOWN_BISHOP, COOLDOWN_KING, COOLDOWN_KNIGHT, COOLDOWN_PAWN, COOLDOWN_QUEEN,
-        COOLDOWN_ROOK,
+        BOARD_TICK_RATE, COOLDOWN_BISHOP, COOLDOWN_KING, COOLDOWN_KNIGHT, COOLDOWN_PAWN,
+        COOLDOWN_QUEEN, COOLDOWN_ROOK,
     },
     coordinate::Coord,
     movegen::MoveGen,
     piece::{Color, Move, Piece},
 };
 use core::fmt;
-use std::{fmt::Debug, time::Duration};
+use std::fmt::Debug;
 
 #[derive(Debug, Clone)]
 #[allow(clippy::struct_excessive_bools)]
@@ -215,9 +215,7 @@ impl Board {
         for y in 0..8 {
             for x in 0..8 {
                 if let Some(mut piece) = self.pieces[y][x] {
-                    let new_cd = piece
-                        .get_cooldown()
-                        .saturating_sub(Duration::from_millis(16));
+                    let new_cd = piece.get_cooldown().saturating_sub(BOARD_TICK_RATE);
                     piece.set_cooldown(new_cd);
                     self.pieces[y][x] = Some(piece);
                 }

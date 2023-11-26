@@ -6,3 +6,5 @@ pub const COOLDOWN_BISHOP: Duration = Duration::from_millis(1500);
 pub const COOLDOWN_ROOK: Duration = Duration::from_millis(5000);
 pub const COOLDOWN_QUEEN: Duration = Duration::from_millis(9000);
 pub const COOLDOWN_KING: Duration = Duration::from_millis(1500);
+
+pub const BOARD_TICK_RATE: Duration = Duration::from_millis(16);
