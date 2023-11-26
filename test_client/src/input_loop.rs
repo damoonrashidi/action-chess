@@ -15,10 +15,10 @@ pub(crate) fn input_loop(
 ) -> JoinHandle<anyhow::Result<()>> {
     thread::spawn(move || -> anyhow::Result<()> {
         loop {
-            let mut str = String::new();
-            stdin().read_line(&mut str)?;
+            let mut input = String::new();
+            stdin().read_line(&mut input)?;
 
-            if str.trim() == "debug" {
+            if input.trim() == "debug" {
                 if let Ok(board) = board.lock() {
                     println!(
                         "Attacks on White: {}",
@@ -31,12 +31,12 @@ pub(crate) fn input_loop(
                     println!("White HP: {}", board.white_king_hp);
                     println!("Black HP: {}", board.black_king_hp);
                 }
-            } else if let Some(mv) = parse_move(&str) {
+            } else if let Some(mv) = parse_move(&input) {
                 client.make_move(mv);
-            } else if !str.trim().is_empty() {
+            } else if !input.trim().is_empty() {
                 println!(
                     "could not parse {} into move, board state unchanged",
-                    str.trim()
+                    input.trim()
                 );
             }
         }
