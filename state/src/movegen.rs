@@ -155,7 +155,7 @@ impl<'board> MoveGen<'board> {
 
         moves
             .into_iter()
-            .filter(|m| !self.move_would_result_in_check(m, piece))
+            .filter(|m| !self.move_would_result_in_self_check(m, piece))
             .collect()
     }
 
@@ -193,7 +193,7 @@ impl<'board> MoveGen<'board> {
             true
         })
         .map(|coord| Move::Piece(pos, coord))
-        .filter(|m| !self.move_would_result_in_check(m, piece))
+        .filter(|m| !self.move_would_result_in_self_check(m, piece))
         .collect()
     }
 
@@ -225,7 +225,7 @@ impl<'board> MoveGen<'board> {
 
         moves
             .into_iter()
-            .filter(|m| !self.move_would_result_in_check(m, piece))
+            .filter(|m| !self.move_would_result_in_self_check(m, piece))
             .collect()
     }
 
@@ -256,7 +256,7 @@ impl<'board> MoveGen<'board> {
 
         moves
             .into_iter()
-            .filter(|m| !self.move_would_result_in_check(m, piece))
+            .filter(|m| !self.move_would_result_in_self_check(m, piece))
             .collect()
     }
 
@@ -366,7 +366,7 @@ impl<'board> MoveGen<'board> {
         natural_moves
     }
 
-    fn move_would_result_in_check(&self, m: &Move, piece: &Piece) -> bool {
+    fn move_would_result_in_self_check(&self, m: &Move, piece: &Piece) -> bool {
         let mut board = self.board.filter_by_color(piece.get_color().opposite());
         let king_pos = self
             .board
@@ -433,7 +433,7 @@ impl<'board> MoveGen<'board> {
                         )
                     }
                     (Some(p), false) => {
-                        if p.get_cooldown().gt(&Duration::ZERO) {
+                        if p.get_cooldown() > Duration::ZERO {
                             format!(
                                 "{render}|{}{}{}",
                                 " ".on_red(),

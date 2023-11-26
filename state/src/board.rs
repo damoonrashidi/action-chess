@@ -8,7 +8,7 @@ use super::{
     piece::{Color, Move, Piece},
 };
 use core::fmt;
-use std::fmt::Debug;
+use std::{collections::HashSet, fmt::Debug};
 
 #[derive(Debug, Clone)]
 #[allow(clippy::struct_excessive_bools)]
@@ -19,6 +19,9 @@ pub struct Board {
     pub white_can_castle_queenside: bool,
     pub black_can_castle_kingside: bool,
     pub black_can_castle_queenside: bool,
+
+    pub white_king_hp: usize,
+    pub black_king_hp: usize,
 }
 
 impl Board {
@@ -57,6 +60,8 @@ impl Board {
             white_can_castle_queenside: true,
             black_can_castle_kingside: true,
             black_can_castle_queenside: true,
+            white_king_hp: 1000,
+            black_king_hp: 1000,
         }
     }
 
@@ -68,6 +73,8 @@ impl Board {
             white_can_castle_queenside: false,
             black_can_castle_kingside: false,
             black_can_castle_queenside: false,
+            white_king_hp: 0,
+            black_king_hp: 0,
         }
     }
 
@@ -221,6 +228,18 @@ impl Board {
                 }
             }
         }
+
+        let tick_multiplier = BOARD_TICK_RATE.as_millis() as usize;
+
+        let attacks_on_white = self.king_check_count(Color::White);
+        self.white_king_hp = self
+            .white_king_hp
+            .saturating_sub(tick_multiplier * attacks_on_white as usize);
+
+        let attacks_on_black = self.king_check_count(Color::Black);
+        self.black_king_hp = self
+            .white_king_hp
+            .saturating_sub(tick_multiplier * attacks_on_black as usize);
     }
 
     #[must_use]
@@ -229,20 +248,25 @@ impl Board {
         let moves = gen.get_possible_moves_for_color(color.opposite());
 
         let mut count = 0;
+        let mut attack_positions: HashSet<Coord> = HashSet::new();
 
         if let Some(king_position) = self.get_coord_for_piece(&Piece::King(color, COOLDOWN_KING)) {
             for mv in moves {
                 match mv {
-                    Move::Piece(_, to) | Move::Promotion(_, to, _) => {
+                    Move::Piece(_, to) => {
                         if to == king_position {
                             count += 1;
+                        }
+                    }
+                    Move::Promotion(from, to, _) => {
+                        if !attack_positions.contains(&from) && to == king_position {
+                            count += 1;
+                            attack_positions.insert(from);
                         }
                     }
                     _ => {}
                 }
             }
-
-            return count;
         }
 
         count
@@ -316,12 +340,17 @@ impl From<&str> for Board {
             }
         }
 
+        let white_king_hp = parts.get(6).and_then(|hp| hp.parse().ok()).unwrap_or(1000);
+        let black_king_hp = parts.get(7).and_then(|hp| hp.parse().ok()).unwrap_or(1000);
+
         Board {
             pieces,
             white_can_castle_kingside: white_kingside,
             white_can_castle_queenside: white_queenside,
             black_can_castle_kingside: black_kingside,
             black_can_castle_queenside: black_queenside,
+            white_king_hp,
+            black_king_hp,
         }
     }
 }
@@ -334,18 +363,36 @@ impl Default for Board {
 
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut board = String::new();
+        let dash = "\u{02501}";
+        let trip_dash = "\u{02501}\u{02501}\u{02501}";
+        let pipe = "\u{02503}";
+
+        let mut render = format!("\t\tBlack HP: {}\n\n", self.black_king_hp);
+        render = format!("{render}      A | B | C | D | E | F | G | H \n");
+        render = format!("{render}    \u{0250F}{}\u{02513}\n", [dash; 31].join(""));
 
         for y in (0..8).rev() {
-            board = format!("{board}{} ", y + 1);
+            render = format!("\n{render}  {} ", y + 1);
             for x in 0..8 {
                 match self.pieces[y][x] {
-                    Some(piece) => board = format!("{board}{piece}"),
-                    None => board = format!("{board} "),
+                    Some(p) => render = format!("{render}{pipe} {p} "),
+                    None => render = format!("{render}{pipe}   "),
                 }
             }
-            board = format!("{board}\n");
+            render = format!("{render}{pipe} {}\n ", y + 1);
+            if y == 0 {
+                render = format!(
+                    "{render}   \u{02517}{}\u{0251B}\n",
+                    [trip_dash; 8].join("\u{0253B}")
+                );
+            } else {
+                render = format!("{render}   {pipe}{}{pipe}\n", [trip_dash; 8].join("╋"));
+            }
         }
-        write!(f, "{board}\n  abcdefgh")
+
+        render = format!("{render}      A | B | C | D | E | F | G | H \n");
+        render = format!("{render}\n\t\tWhite HP: {}", self.white_king_hp);
+
+        write!(f, "{render}")
     }
 }

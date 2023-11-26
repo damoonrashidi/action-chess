@@ -225,6 +225,15 @@ mod king_moves {
             .map(|target| Move::Piece(start_pos, *target))
             .all(|m| moves.contains(&m))
     }
+
+    #[test]
+    fn check_in_standard() {
+        let mut board = Board::standard();
+        board.set_piece_at(Some(Piece::Pawn(White, Duration::ZERO)), D7);
+        let attacks = board.king_check_count(Black);
+
+        assert_eq!(attacks, 1);
+    }
 }
 
 #[cfg(test)]
