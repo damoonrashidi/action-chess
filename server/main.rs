@@ -1,7 +1,6 @@
 mod handlers;
 mod world;
 use std::{
-    io::Result,
     net::UdpSocket,
     sync::{Arc, Mutex},
     thread::{self, JoinHandle},
@@ -16,8 +15,8 @@ fn main() -> anyhow::Result<()> {
     let socket_clone = socket.try_clone()?;
 
     let world = Arc::new(Mutex::new(World::new(socket)));
-    let tick_handle = tick_world(Arc::clone(&world));
-    let command_handle = handle_commands(Arc::clone(&world), socket_clone);
+    let tick_handle = tick_world(&world);
+    let command_handle = handle_commands(&world, socket_clone);
 
     let _ = command_handle.join();
     let _ = tick_handle.join();
@@ -25,7 +24,8 @@ fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn tick_world(world: Arc<Mutex<World>>) -> JoinHandle<()> {
+fn tick_world(world: &Arc<Mutex<World>>) -> JoinHandle<()> {
+    let world = Arc::clone(world);
     thread::spawn(move || loop {
         if let Ok(mut world) = world.lock() {
             for game in world.games_mut() {
@@ -36,8 +36,12 @@ fn tick_world(world: Arc<Mutex<World>>) -> JoinHandle<()> {
     })
 }
 
-fn handle_commands(world: Arc<Mutex<World>>, socket: UdpSocket) -> JoinHandle<Result<()>> {
-    thread::spawn(move || -> Result<()> {
+fn handle_commands(
+    world: &Arc<Mutex<World>>,
+    socket: UdpSocket,
+) -> JoinHandle<std::io::Result<()>> {
+    let world = Arc::clone(world);
+    thread::spawn(move || -> std::io::Result<()> {
         loop {
             let mut msg: [u8; 4] = [0, 0, 0, 0];
             let (_, addr) = socket.recv_from(&mut msg)?;
