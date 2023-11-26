@@ -223,27 +223,34 @@ impl Board {
         }
     }
 
-    #[allow(unused)]
-    fn is_valid_move(&self, mv: Move) -> bool {
+    #[must_use]
+    pub fn king_check_count(&self, color: Color) -> u8 {
         let gen = MoveGen::new(self);
+        let moves = gen.get_possible_moves_for_color(color.opposite());
 
-        let moves = gen.get_possible_moves();
+        let mut count = 0;
 
-        if !moves.contains(&mv) {
-            return false;
+        if let Some(king_position) = self.get_coord_for_piece(&Piece::King(color, COOLDOWN_KING)) {
+            for mv in moves {
+                match mv {
+                    Move::Piece(_, to) | Move::Promotion(_, to, _) => {
+                        if to == king_position {
+                            count += 1;
+                        }
+                    }
+                    _ => {}
+                }
+            }
+
+            return count;
         }
 
-        match mv {
-            Move::KingSideCastle(color) => match color {
-                Color::White => self.white_can_castle_kingside,
-                Color::Black => self.black_can_castle_kingside,
-            },
-            Move::QueenSideCastle(color) => match color {
-                Color::White => self.white_can_castle_queenside,
-                Color::Black => self.black_can_castle_queenside,
-            },
-            _ => true,
-        }
+        count
+    }
+
+    #[must_use]
+    pub fn is_valid_move(&self, mv: Move) -> bool {
+        MoveGen::new(self).get_possible_moves().contains(&mv)
     }
 }
 

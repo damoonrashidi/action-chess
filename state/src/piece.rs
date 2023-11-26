@@ -67,15 +67,6 @@ impl Piece {
 
     #[inline]
     #[must_use]
-    pub fn opposing_color(&self) -> Color {
-        match self.get_color() {
-            Color::White => Color::Black,
-            Color::Black => Color::White,
-        }
-    }
-
-    #[inline]
-    #[must_use]
     pub fn get_cooldown(&self) -> Duration {
         match self {
             Piece::Pawn(_, cd)
@@ -124,6 +115,16 @@ impl PartialEq for Piece {
 pub enum Color {
     White,
     Black,
+}
+
+impl Color {
+    #[must_use]
+    pub fn opposite(&self) -> Color {
+        match self {
+            Color::White => Color::Black,
+            Color::Black => Color::White,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]

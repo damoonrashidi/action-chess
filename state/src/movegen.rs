@@ -279,7 +279,7 @@ impl<'board> MoveGen<'board> {
             .filter(|coord| {
                 if let Some(opposing_king_pos) = self
                     .board
-                    .get_coord_for_piece(&Piece::King(piece.opposing_color(), COOLDOWN_KING))
+                    .get_coord_for_piece(&Piece::King(piece.get_color().opposite(), COOLDOWN_KING))
                 {
                     let file_distance = (opposing_king_pos.0 - coord.0).abs();
                     let rank_distance = (opposing_king_pos.1 - coord.1).abs();
@@ -294,11 +294,13 @@ impl<'board> MoveGen<'board> {
                 true
             })
             .filter(|coord| {
-                let mut enemy_board = self.board.filter_by_color(piece.opposing_color());
+                let mut enemy_board = self.board.filter_by_color(piece.get_color().opposite());
                 enemy_board.set_piece_at(Some(*piece), *coord);
-                enemy_board.remove_by_piece(&Piece::King(piece.opposing_color(), COOLDOWN_KING));
+                enemy_board
+                    .remove_by_piece(&Piece::King(piece.get_color().opposite(), COOLDOWN_KING));
                 let movegen = MoveGen::new(&enemy_board);
-                let enemy_moves = movegen.get_possible_moves_for_color(piece.opposing_color());
+                let enemy_moves =
+                    movegen.get_possible_moves_for_color(piece.get_color().opposite());
                 let enemy_can_capture_at_coord = enemy_moves
                     .iter()
                     .filter_map(|m| match m {
@@ -365,7 +367,7 @@ impl<'board> MoveGen<'board> {
     }
 
     fn move_would_result_in_check(&self, m: &Move, piece: &Piece) -> bool {
-        let mut board = self.board.filter_by_color(piece.opposing_color());
+        let mut board = self.board.filter_by_color(piece.get_color().opposite());
         let king_pos = self
             .board
             .get_coord_for_piece(&Piece::King(piece.get_color(), COOLDOWN_KING));
@@ -377,7 +379,7 @@ impl<'board> MoveGen<'board> {
             _ => {}
         }
         let gen = MoveGen::new(&board);
-        let moves = gen.get_possible_moves_for_color(piece.opposing_color());
+        let moves = gen.get_possible_moves_for_color(piece.get_color().opposite());
 
         moves
             .into_iter()
