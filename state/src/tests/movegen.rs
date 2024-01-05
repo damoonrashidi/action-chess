@@ -230,9 +230,9 @@ mod king_moves {
     fn check_in_standard() {
         let mut board = Board::standard();
         board.set_piece_at(Some(Piece::Pawn(White, Duration::ZERO)), D7);
-        let attacks = board.king_check_count(Black);
+        let (_, attacks_on_black) = board.king_check_count();
 
-        assert_eq!(attacks, 1);
+        assert_eq!(attacks_on_black, 1);
     }
 }
 
@@ -250,21 +250,6 @@ mod pawn_moves {
         },
         square::*,
     };
-
-    #[test]
-    fn pinned_pawn() {
-        let mut board = Board::from("8/8/KP5r/8/8/8/8/8 b - - 0 0");
-        for y in 0..8 {
-            for x in 0..8 {
-                if let Some(mut piece) = board.pieces[x][y] {
-                    piece.set_cooldown(Duration::ZERO);
-                    board.pieces[x][y] = Some(piece);
-                }
-            }
-        }
-        let moves = MoveGen::new(&board).for_pawn(&Piece::Pawn(White, Duration::ZERO), B6);
-        assert_eq!(moves.len(), 0);
-    }
 
     #[test]
     fn pawn_capture() {
@@ -424,21 +409,6 @@ mod rook_moves {
         let moves = MoveGen::new(&board).for_rook(&Piece::Rook(Black, Duration::ZERO), A1);
 
         assert_eq!(vec![Move::Piece(A1, A2), Move::Piece(A1, B1)], moves);
-    }
-
-    #[test]
-    fn pinned_rook() {
-        let mut board = Board::from("8/8/KR5r/8/8/8/8/8 b - - 0 0");
-        for y in 0..8 {
-            for x in 0..8 {
-                if let Some(mut piece) = board.pieces[x][y] {
-                    piece.set_cooldown(Duration::ZERO);
-                    board.pieces[x][y] = Some(piece);
-                }
-            }
-        }
-        let moves = MoveGen::new(&board).for_rook(&Piece::Rook(White, Duration::ZERO), B6);
-        assert_eq!(moves.len(), 6);
     }
 
     fn move_lists_has_all_targets(

@@ -154,9 +154,6 @@ impl<'board> MoveGen<'board> {
         }
 
         moves
-            .into_iter()
-            .filter(|m| !self.move_would_result_in_self_check(m, piece))
-            .collect()
     }
 
     #[must_use]
@@ -193,7 +190,6 @@ impl<'board> MoveGen<'board> {
             true
         })
         .map(|coord| Move::Piece(pos, coord))
-        .filter(|m| !self.move_would_result_in_self_check(m, piece))
         .collect()
     }
 
@@ -224,9 +220,6 @@ impl<'board> MoveGen<'board> {
         }
 
         moves
-            .into_iter()
-            .filter(|m| !self.move_would_result_in_self_check(m, piece))
-            .collect()
     }
 
     #[must_use]
@@ -254,10 +247,7 @@ impl<'board> MoveGen<'board> {
             }
         }
 
-        moves
-            .into_iter()
-            .filter(|m| !self.move_would_result_in_self_check(m, piece))
-            .collect()
+        moves.into_iter().collect()
     }
 
     #[must_use]
@@ -364,31 +354,6 @@ impl<'board> MoveGen<'board> {
         }
 
         natural_moves
-    }
-
-    fn move_would_result_in_self_check(&self, m: &Move, piece: &Piece) -> bool {
-        let mut board = self.board.filter_by_color(piece.get_color().opposite());
-        let king_pos = self
-            .board
-            .get_coord_for_piece(&Piece::King(piece.get_color(), COOLDOWN_KING));
-        if king_pos.is_none() {
-            return false;
-        }
-        match m {
-            Move::Promotion(_, to, _) | Move::Piece(_, to) => board.set_piece_at(Some(*piece), *to),
-            _ => {}
-        }
-        let gen = MoveGen::new(&board);
-        let moves = gen.get_possible_moves_for_color(piece.get_color().opposite());
-
-        moves
-            .into_iter()
-            .filter_map(|m| match m {
-                Move::Promotion(_, to, _) | Move::Piece(_, to) => Some(to),
-                _ => None,
-            })
-            .collect::<Vec<Coord>>()
-            .contains(&king_pos.unwrap())
     }
 
     fn all_promotions_at_pos(from: Coord, to: Coord, piece: &Piece) -> Vec<Move> {

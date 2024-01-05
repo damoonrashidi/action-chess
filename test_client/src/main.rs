@@ -3,8 +3,9 @@ mod game_loop;
 mod input_loop;
 mod parse_input;
 
+use crate::game_loop::game_loop;
 #[allow(unused)]
-use crate::{commands::listen, game_loop::game_loop, input_loop::input_loop};
+use crate::{commands::listen, input_loop::input_loop};
 use chess_client::ChessClient;
 use clap::Parser;
 use state::board::Board;
@@ -35,13 +36,13 @@ fn main() -> anyhow::Result<()> {
     println!("{}", Board::standard());
 
     let incoming_commands = listen(&board, client.listen());
-    let game_loop_handle = game_loop(&board);
+    let tick_handle = game_loop(&board);
     let input_handle = input_loop(client, board);
 
     let _ = (
         incoming_commands.join(),
         input_handle.join(),
-        game_loop_handle.join(),
+        tick_handle.join(),
     );
 
     Ok(())

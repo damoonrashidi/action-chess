@@ -8,7 +8,7 @@ use super::{
     piece::{Color, Move, Piece},
 };
 use core::fmt;
-use std::{collections::HashSet, fmt::Debug};
+use std::{collections::HashSet, fmt::Debug, time::Duration};
 
 #[derive(Debug, Clone)]
 #[allow(clippy::struct_excessive_bools)]
@@ -20,8 +20,8 @@ pub struct Board {
     pub black_can_castle_kingside: bool,
     pub black_can_castle_queenside: bool,
 
-    pub white_king_hp: usize,
-    pub black_king_hp: usize,
+    pub white_hp: usize,
+    pub black_hp: usize,
 }
 
 impl Board {
@@ -60,8 +60,8 @@ impl Board {
             white_can_castle_queenside: true,
             black_can_castle_kingside: true,
             black_can_castle_queenside: true,
-            white_king_hp: 1000,
-            black_king_hp: 1000,
+            white_hp: 5_000,
+            black_hp: 5_000,
         }
     }
 
@@ -73,8 +73,8 @@ impl Board {
             white_can_castle_queenside: false,
             black_can_castle_kingside: false,
             black_can_castle_queenside: false,
-            white_king_hp: 0,
-            black_king_hp: 0,
+            white_hp: 0,
+            black_hp: 0,
         }
     }
 
@@ -229,47 +229,56 @@ impl Board {
             }
         }
 
-        let tick_multiplier = BOARD_TICK_RATE.as_millis() as usize;
-
-        let attacks_on_white = self.king_check_count(Color::White);
-        self.white_king_hp = self
-            .white_king_hp
-            .saturating_sub(tick_multiplier * attacks_on_white as usize);
-
-        let attacks_on_black = self.king_check_count(Color::Black);
-        self.black_king_hp = self
-            .white_king_hp
-            .saturating_sub(tick_multiplier * attacks_on_black as usize);
+        let (attacks_on_white, attacks_on_black) = self.king_check_count();
+        self.white_hp = self.white_hp.saturating_sub(attacks_on_white as usize);
+        self.black_hp = self.white_hp.saturating_sub(attacks_on_black as usize);
     }
 
     #[must_use]
-    pub fn king_check_count(&self, color: Color) -> u8 {
-        let gen = MoveGen::new(self);
-        let moves = gen.get_possible_moves_for_color(color.opposite());
+    pub fn king_check_count(&self) -> (u8, u8) {
+        let mut attacks_on_white = 0;
+        let mut attacks_on_black = 0;
 
-        let mut count = 0;
+        let gen = MoveGen::new(self);
         let mut attack_positions: HashSet<Coord> = HashSet::new();
 
-        if let Some(king_position) = self.get_coord_for_piece(&Piece::King(color, COOLDOWN_KING)) {
-            for mv in moves {
-                match mv {
-                    Move::Piece(_, to) => {
-                        if to == king_position {
-                            count += 1;
-                        }
+        let white_king_pos =
+            self.get_coord_for_piece(&Piece::King(Color::White, Duration::default()));
+        let black_king_pos =
+            self.get_coord_for_piece(&Piece::King(Color::Black, Duration::default()));
+
+        for mv in gen.get_possible_moves() {
+            match (mv, white_king_pos) {
+                (Move::Piece(_, to), Some(white_king_pos)) => {
+                    if to == white_king_pos {
+                        attacks_on_white += 1;
                     }
-                    Move::Promotion(from, to, _) => {
-                        if !attack_positions.contains(&from) && to == king_position {
-                            count += 1;
-                            attack_positions.insert(from);
-                        }
-                    }
-                    _ => {}
                 }
-            }
+                (Move::Promotion(from, to, _), Some(white_king_pos)) => {
+                    if to == white_king_pos && !attack_positions.contains(&from) {
+                        attack_positions.insert(from);
+                        attacks_on_white += 1;
+                    }
+                }
+                _ => {}
+            };
+            match (mv, black_king_pos) {
+                (Move::Piece(_, to), Some(black_king_pos)) => {
+                    if to == black_king_pos {
+                        attacks_on_black += 1;
+                    }
+                }
+                (Move::Promotion(from, to, _), Some(black_king_pos)) => {
+                    if to == black_king_pos && !attack_positions.contains(&from) {
+                        attack_positions.insert(from);
+                        attacks_on_black += 1;
+                    }
+                }
+                _ => {}
+            };
         }
 
-        count
+        (attacks_on_white, attacks_on_black)
     }
 
     #[must_use]
@@ -349,8 +358,8 @@ impl From<&str> for Board {
             white_can_castle_queenside: white_queenside,
             black_can_castle_kingside: black_kingside,
             black_can_castle_queenside: black_queenside,
-            white_king_hp,
-            black_king_hp,
+            white_hp: white_king_hp,
+            black_hp: black_king_hp,
         }
     }
 }
@@ -367,7 +376,7 @@ impl fmt::Display for Board {
         let trip_dash = "\u{02501}\u{02501}\u{02501}";
         let pipe = "\u{02503}";
 
-        let mut render = format!("\t\tBlack HP: {}\n\n", self.black_king_hp);
+        let mut render = format!("\t\tBlack HP: {}\n\n", self.black_hp);
         render = format!("{render}      A | B | C | D | E | F | G | H \n");
         render = format!("{render}    \u{0250F}{}\u{02513}\n", [dash; 31].join(""));
 
@@ -391,7 +400,7 @@ impl fmt::Display for Board {
         }
 
         render = format!("{render}      A | B | C | D | E | F | G | H \n");
-        render = format!("{render}\n\t\tWhite HP: {}", self.white_king_hp);
+        render = format!("{render}\n\t\tWhite HP: {}", self.white_hp);
 
         write!(f, "{render}")
     }

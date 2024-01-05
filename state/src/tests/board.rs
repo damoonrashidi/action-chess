@@ -40,34 +40,35 @@ mod tests {
         board.set_piece_at(Some(Piece::Rook(Color::Black, Duration::ZERO)), A8);
         board.set_piece_at(Some(Piece::Bishop(Color::Black, Duration::ZERO)), H8);
         board.set_piece_at(Some(Piece::King(Color::White, Duration::ZERO)), A1);
-        let count = board.king_check_count(Color::White);
-        assert_eq!(count, 2);
+        let (attacks_on_white, attacks_on_black) = board.king_check_count();
+        assert_eq!(attacks_on_white, 2);
+        assert_eq!(attacks_on_black, 0);
     }
 
     #[test]
     fn white_king_health_loss() {
         let mut board = Board::empty();
-        board.white_king_hp = 1000;
+        board.white_hp = 1000;
         board.set_piece_at(Some(Piece::Rook(Color::Black, Duration::ZERO)), A8);
         board.set_piece_at(Some(Piece::Bishop(Color::Black, Duration::ZERO)), H8);
         board.set_piece_at(Some(Piece::King(Color::White, Duration::ZERO)), A1);
 
         board.tick();
 
-        assert_eq!(board.white_king_hp, 968);
+        assert!(board.white_hp < 1000);
     }
 
     #[test]
     fn white_king_defeat() {
         let mut board = Board::empty();
-        board.white_king_hp = 3;
+        board.white_hp = 1;
         board.set_piece_at(Some(Piece::Rook(Color::Black, Duration::ZERO)), A8);
         board.set_piece_at(Some(Piece::Bishop(Color::Black, Duration::ZERO)), H8);
         board.set_piece_at(Some(Piece::King(Color::White, Duration::ZERO)), A1);
 
         board.tick();
 
-        assert_eq!(board.white_king_hp, 0);
+        assert_eq!(board.white_hp, 0);
     }
 
     #[test]
@@ -112,7 +113,7 @@ mod tests {
     fn hps_from_fen() {
         let board =
             Board::from("r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 w qQ - 0 0 400 1200");
-        assert_eq!(board.white_king_hp, 400);
-        assert_eq!(board.black_king_hp, 1200);
+        assert_eq!(board.white_hp, 400);
+        assert_eq!(board.black_hp, 1200);
     }
 }

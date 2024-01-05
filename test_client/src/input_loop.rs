@@ -20,16 +20,11 @@ pub(crate) fn input_loop(
 
             if input.trim() == "debug" {
                 if let Ok(board) = board.lock() {
-                    println!(
-                        "Attacks on White: {}",
-                        board.king_check_count(state::piece::Color::White)
-                    );
-                    println!(
-                        "Attacks on Black: {}",
-                        board.king_check_count(state::piece::Color::Black)
-                    );
-                    println!("White HP: {}", board.white_king_hp);
-                    println!("Black HP: {}", board.black_king_hp);
+                    let (attacks_on_white, attacks_on_black) = board.king_check_count();
+                    println!("Attacks on White: {attacks_on_white}");
+                    println!("Attacks on Black: {attacks_on_black}");
+                    println!("White HP: {}", board.white_hp);
+                    println!("Black HP: {}", board.black_hp);
                 }
             } else if let Some(mv) = parse_move(&input) {
                 client.make_move(mv);
