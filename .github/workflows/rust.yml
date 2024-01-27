@@ -21,7 +21,7 @@ jobs:
           components: rustfmt, clippy
       - uses: actions/checkout@v3
       - name: Build
-        run: cargo build --all
+        run: cargo build --all --release
       - name: Lint
         run: cargo clippy --all -- -D warnings
       - name: Run tests
