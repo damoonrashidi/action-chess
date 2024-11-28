@@ -3,7 +3,8 @@ use crate::world::World;
 use network::{game_command::GameCmd, marshal::Marshal};
 use std::net::SocketAddr;
 
-pub(crate) struct CommandHandler;
+#[derive(Debug)]
+pub struct CommandHandler;
 
 impl Handler for CommandHandler {
     fn handle(player: SocketAddr, msg: [u8; 4], world: &mut World) {

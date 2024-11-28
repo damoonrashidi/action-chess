@@ -1,5 +1,5 @@
-mod handlers;
-mod world;
+pub mod handlers;
+pub mod world;
 use std::{
     net::UdpSocket,
     sync::{Arc, Mutex},
@@ -7,7 +7,6 @@ use std::{
 };
 
 use handlers::handler::Handler;
-use state::cooldowns::BOARD_TICK_RATE;
 use world::World;
 
 fn main() -> anyhow::Result<()> {
@@ -15,25 +14,11 @@ fn main() -> anyhow::Result<()> {
     let socket_clone = socket.try_clone()?;
 
     let world = Arc::new(Mutex::new(World::new(socket)));
-    let tick_handle = tick_world(&world);
     let command_handle = handle_commands(&world, socket_clone);
 
     let _ = command_handle.join();
-    let _ = tick_handle.join();
 
     Ok(())
-}
-
-fn tick_world(world: &Arc<Mutex<World>>) -> JoinHandle<()> {
-    let world = Arc::clone(world);
-    thread::spawn(move || loop {
-        if let Ok(mut world) = world.lock() {
-            for game in world.games_mut() {
-                game.tick();
-            }
-        }
-        thread::sleep(BOARD_TICK_RATE);
-    })
 }
 
 fn handle_commands(
